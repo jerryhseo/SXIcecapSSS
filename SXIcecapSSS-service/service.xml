@@ -1,0 +1,87 @@
+<?xml version="1.0"?>
+<!DOCTYPE service-builder PUBLIC "-//Liferay//DTD Service Builder 7.2.0//EN" "http://www.liferay.com/dtd/liferay-service-builder_7_2_0.dtd">
+
+<service-builder dependency-injector="ds" package-path="com.sx.icecap.sss">
+	<namespace>sxicecapsss</namespace>
+	<entity name="Term" local-service="true" uuid="true" remote-service="true">
+		
+		<!-- PK fields -->
+		<column name="termId" primary="true" type="long"></column>
+
+		<!-- Audit fields -->
+		<column name="groupId" type="long"></column>
+		<column name="companyId" type="long"></column>
+		<column name="userId" type="long"></column>
+		<column name="userName" type="String"></column>
+		<column name="createDate" type="Date"></column>
+		<column name="modifiedDate" type="Date"></column>
+
+		<!-- Status fields for workflow -->
+		<column name="status" type="int" />
+		<column name="statusByUserId" type="long" />
+		<column name="statusByUserName" type="String" />
+		<column name="statusDate" type="Date" />
+		
+		<!-- Field for Staging --> 
+		<column name="lastPublishDate" type="Date" />
+
+		<!-- Descriptive  fields -->
+		<column name="termName" type="String"></column>
+		<column name="termVersion" type="String"></column>
+		<column name="termType" type="String"></column>
+		<column name="displayName" localized="true" type="String"></column>
+		<column name="definition" localized="true" type="String"></column>
+		<column name="tooltip" localized="true" type="String"></column>
+		<column name="synonyms" type="String"></column>
+		
+		<!-- type attribute JSON -->
+		<column name="attributesJSON" type="String"></column>
+		
+		<order>
+			<order-column name="createDate" order-by="desc" />
+		</order>
+		
+		<finder name="GroupId" return-type="Collection">
+			<finder-column name="groupId" />
+		</finder>
+		<finder name="UserId" return-type="Collection">
+			<finder-column name="userId" />
+		</finder>
+		<finder name="Status" return-type="Collection">
+			<finder-column name="status" />
+		</finder>
+		<finder name="G_U" return-type="Collection">
+			<finder-column name="groupId" />
+			<finder-column name="userId" />
+		</finder>
+		<finder name="G_S" return-type="Collection">
+			<finder-column name="groupId" />
+			<finder-column name="status" />
+		</finder>
+		<finder name="U_S" return-type="Collection">
+			<finder-column name="userId" />
+			<finder-column name="status" />
+		</finder>
+		<finder name="G_U_S" return-type="Collection">
+			<finder-column name="groupId" />
+			<finder-column name="userId" />
+			<finder-column name="status" />
+		</finder>
+		
+		<finder name="Name" return-type="Collection">
+			<finder-column name="termName" />
+		</finder>
+		
+		<reference entity="AssetEntry" package-path="com.liferay.portlet.asset" />
+		<reference entity="AssetLink" package-path="com.liferay.portlet.asset" />
+		<reference entity="RatingsStats" package-path="com.liferay.portlet.ratings" />
+		<reference entity="TrashEntry" package-path="com.liferay.portlet.trash" />
+		<reference entity="TrashVersion" package-path="com.liferay.portlet.trash" />
+		<reference entity="WorkflowInstanceLink" package-path="com.liferay.portal" />
+	</entity>
+	
+	<exceptions>
+        <exception>DuplicatedTermName</exception>
+        <exception>InvalidTermName</exception>
+	</exceptions>
+</service-builder>

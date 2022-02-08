@@ -1,0 +1,15 @@
+Bundle-Name: SXIcecapSSS-api
+Bundle-SymbolicName: com.sx.icecap.sss.api
+Bundle-Version: 1.0.0
+Export-Package:\
+	com.sx.icecap.sss.exception,\
+	com.sx.icecap.sss.model,\
+	com.sx.icecap.sss.service,\
+	com.sx.icecap.sss.service.persistence,\
+	com.sx.icecap.sss.util.term,\
+	com.sx.icecap.sss.util.comparator,\
+	com.sx.icecap.sss.util,\
+	com.sx.icecap.sss.debug,\
+	com.sx.icecap.sss.constants
+-check: EXPORTS
+-includeresource: META-INF/service.xml=../SXIcecapSSS-service/service.xml
