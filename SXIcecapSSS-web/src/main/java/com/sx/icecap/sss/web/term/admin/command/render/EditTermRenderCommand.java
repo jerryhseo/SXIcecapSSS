@@ -6,6 +6,7 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.sx.icecap.sss.constants.IcecapSSSJsps;
 import com.sx.icecap.sss.constants.IcecapSSSWebKeys;
 import com.sx.icecap.sss.constants.IcecapSSSWebPortletKeys;
+import com.sx.icecap.sss.debug.Debug;
 import com.sx.icecap.sss.constants.IcecapSSSMVCCommands;
 import com.sx.icecap.sss.model.Term;
 import com.sx.icecap.sss.service.TermLocalService;
@@ -46,6 +47,8 @@ public class EditTermRenderCommand implements MVCRenderCommand {
 			String termType = ParamUtil.getString(renderRequest, IcecapSSSWebKeys.TERM_TYPE);
 //			System.out.println("In Edit Render: termType - " + termType );
 		}
+		
+		Debug.printAllParameters(renderRequest);
 		
 		return IcecapSSSJsps.ADMIN_EDIT_TERM_JSP;
 	}

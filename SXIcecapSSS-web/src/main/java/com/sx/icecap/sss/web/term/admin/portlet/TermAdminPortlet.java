@@ -1,6 +1,5 @@
 package com.sx.icecap.sss.web.term.admin.portlet;
 
-
 import com.liferay.portal.kernel.portlet.bridges.mvc.MVCPortlet;
 import com.sx.icecap.sss.constants.IcecapSSSJsps;
 import com.sx.icecap.sss.constants.IcecapSSSWebPortletKeys;

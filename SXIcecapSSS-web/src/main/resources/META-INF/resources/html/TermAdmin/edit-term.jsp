@@ -20,6 +20,8 @@
 <%@page import="java.util.List"%>
 <%@ include file="../init.jsp" %>
 
+<link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/css/main.css">
+
 <%
 	Term term = (Term)renderRequest.getAttribute(IcecapSSSWebKeys.TERM);
 
@@ -47,15 +49,10 @@
 	System.out.println("Default Term Type: "+defaultTermType);
 %>
 <style>
-.hide {
-	display:none;
-}
 
-.show {
-	display:block;
-}
 </style>
 
+<div class="SXIcecapSSS-web">
 <liferay-portlet:actionURL name="<%=IcecapSSSMVCCommands.ACTION_ADMIN_TERM_ADD%>" var="addTermURL">
 </liferay-portlet:actionURL>
 
@@ -64,45 +61,49 @@
 
 <portlet:actionURL name="<%=IcecapSSSMVCCommands.ACTION_ADMIN_LOAD_TERM_ATTRIBURES%>" var="loadTermAttributesURL"/>
 
-<div class="container-fluid container-fluid-max-xl main-content-body">
 
 <liferay-asset:asset-categories-error />
 <liferay-asset:asset-tags-error />
 
-<aui:row>
-	<aui:col md="3" cssClass="card-horizontal">
-		<aui:form name="termTypeForm" method="POST" action="<%=loadTermAttributesURL%>" markupView="lexicon">
-					<aui:select name="termType" label="term-type" helpMessage="term-type-select-help">
-						<%
-							final String[] parameterTypes = IcecapSSSTermTypes.getTypes();
-										for( String parameterType : parameterTypes ){
-											if( parameterType.equals(IcecapSSSTermTypes.GROUP) || parameterType.equals(IcecapSSSTermTypes.COMMENT) ){
-												continue;
+<aui:container>
+	<aui:row>
+		<aui:col md="3" cssClass="card card-horizontal">
+			<aui:form name="termTypeForm" method="POST" action="<%=loadTermAttributesURL%>" markupView="lexicon">
+						<aui:select name="termType" label="term-type" helpMessage="term-type-select-help">
+							<%
+								final String[] parameterTypes = IcecapSSSTermTypes.getTypes();
+											for( String parameterType : parameterTypes ){
+												if( parameterType.equals(IcecapSSSTermTypes.GROUP) || parameterType.equals(IcecapSSSTermTypes.COMMENT) ){
+													continue;
+												}
+												if( parameterType.equals( defaultTermType )){
+							%>
+								<aui:option label="<%=parameterType%>" value="<%=parameterType%>" selected="<%=true%>"/>
+							<%
+								}
+												else {
+							%>
+									<aui:option label="<%=parameterType%>" value="<%=parameterType%>"/>
+							<%
+								}
 											}
-											if( parameterType.equals( defaultTermType )){
-						%>
-							<aui:option label="<%=parameterType%>" value="<%=parameterType%>" selected="<%=true%>"/>
-						<%
-							}
-											else {
-						%>
-								<aui:option label="<%=parameterType%>" value="<%=parameterType%>"/>
-						<%
-							}
-										}
-						%>
-					</aui:select>
-					
-					<input type="hidden" name="<portlet:namespace/>mvcRenderCommandName" value="<%=IcecapSSSMVCCommands.RENDER_ADMIN_TERM_EDIT%>" >
-					<input type="hidden" name="<portlet:namespace/>termListViewURL" value="<%= redirect %>" >
-		</aui:form>
-	</aui:col>
-	<aui:col md="7">
-	</aui:col>
-	<aui:col md="2" >
-		<clay:link href="<%=redirect %>" icon="list" label="view-term-list" />
-	</aui:col>
-</aui:row>
+							%>
+						</aui:select>
+						
+						<input type="hidden" name="<portlet:namespace/>mvcRenderCommandName" value="<%=IcecapSSSMVCCommands.RENDER_ADMIN_TERM_EDIT%>" >
+						<input type="hidden" name="<portlet:namespace/>termListViewURL" value="<%= backURL %>" >
+			</aui:form>
+		</aui:col>
+		<aui:col md="7">
+		</aui:col>
+		<aui:col md="2" >
+			<%
+			out.println( "backURL: "+backURL );
+			%>
+			<clay:link href="<%=backURL %>" icon="list" label="view-term-list" />
+		</aui:col>
+	</aui:row>
+</aui:container>
 
 <%
 	String actionURL;
@@ -119,6 +120,7 @@
 		jsonDedicatedAttrs = IcecapSSSTermAttributeUtil.toJsonObject(term.getAttributesJSON());
 	}
 %>
+<aui:container>
 <aui:form name="termDefForm" method="POST" action="<%= actionURL %>">
 	<aui:row>
 		<aui:col>
@@ -180,7 +182,7 @@
 	<aui:row>
 		<aui:col>
 			<aui:fieldset-group markupView="lexicon">
-				<aui:fieldset collapsed="<%= false %>" collapsible="<%= true %>" label="categorization" helpMessage="term-categories-help">
+				<aui:fieldset collapsed="<%= true %>" collapsible="<%= true %>" label="categorization" helpMessage="term-categories-help">
 					<liferay-asset:asset-categories-selector 
 								className="<%=Term.class.getName()%>" 
 								classPK="<%= Validator.isNotNull(term)?term.getTermId():0 %>"/>
@@ -191,11 +193,16 @@
 	<aui:button-row>
 		<aui:button name="submit" type="submit" value="<%= submitButtonLabel %>"></aui:button>
 		<aui:button name="clear" type="reset" value="clear"></aui:button>
-		<aui:button name="cancel" type="cancel" value="cancel" href="<%= redirect %>"></aui:button>
+		<c:if test="<%= Validator.isNotNull(term) %>">
+			<portlet:actionURL name="<%=IcecapSSSMVCCommands.ACTION_ADMIN_TERM_DELETE%>" var="deleteTermURL">
+				<portlet:param name="termId" value="<%= String.valueOf(term.getTermId()) %>"/>
+			</portlet:actionURL>
+			<aui:button name="delete" type="delete" value="delete" href="<%= deleteTermURL.toString() %>"></aui:button>
+		</c:if>
+		<aui:button name="cancel" value="cancel" href="<%= backURL %>"></aui:button>
 	</aui:button-row>
-
 </aui:form>
-
+</aui:container>
 
 <script>
 $(document).ready(function(){

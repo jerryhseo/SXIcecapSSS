@@ -79,19 +79,19 @@
 							escapedModel="<%=true%>">
 							
 					<%
-													Map<String, Object> rowData = new HashMap<>();
+						Map<String, Object> rowData = new HashMap<>();
 
-															// rowData.put("actions", StringUtil.merge(termAdminManagementToolbarDisplayContext.getAvailableActions(term)));
+								// rowData.put("actions", StringUtil.merge(termAdminManagementToolbarDisplayContext.getAvailableActions(term)));
 
-															row.setData(rowData);
-															//row.setCssClass("col-md-12");
+								row.setData(rowData);
+								//row.setCssClass("col-md-12");
 
-															PortletURL rowURL = renderResponse.createRenderURL();
+								PortletURL rowURL = renderResponse.createRenderURL();
 
-															rowURL.setParameter(IcecapSSSWebKeys.MVC_RENDER_COMMAND_NAME, IcecapSSSMVCCommands.RENDER_ADMIN_TERM_VIEW);
-															rowURL.setParameter(IcecapSSSWebKeys.REDIRECT, currentURL);
-															rowURL.setParameter(IcecapSSSWebKeys.TERM_ID, String.valueOf(term.getTermId()));
-												%>
+								rowURL.setParameter(IcecapSSSWebKeys.MVC_RENDER_COMMAND_NAME, IcecapSSSMVCCommands.RENDER_ADMIN_TERM_VIEW);
+								rowURL.setParameter(IcecapSSSWebKeys.REDIRECT, currentURL);
+								rowURL.setParameter(IcecapSSSWebKeys.TERM_ID, String.valueOf(term.getTermId()));
+					%>
 					<c:choose>
 						<c:when test="<%= viewStyle.equals(IcecapSSSConstants.VIEW_TYPE_CARDS) %>">
 							<%
@@ -201,7 +201,7 @@ Liferay.componentReady('termAdminManagementToolbar').then(function(
 					cmd: event.data.item.data.cmd,
 					redirect: '<%= currentURL %>'
 				},
-				url: '<portlet:actionURL name="<%=MVCCommandNames.ACTION_ADMIN_BULK_ACTIONS %>" />'
+				url: '<portlet:actionURL name="<%=IcecapSSSMVCCommands.ACTION_ADMIN_BULK_ACTIONS %>" />'
 			});
 		});
 	});

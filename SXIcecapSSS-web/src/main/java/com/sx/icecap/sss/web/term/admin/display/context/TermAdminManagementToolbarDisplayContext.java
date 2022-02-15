@@ -7,10 +7,13 @@ import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItem;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.DropdownItemList;
 import com.liferay.frontend.taglib.clay.servlet.taglib.util.ViewTypeItem;
 import com.liferay.petra.string.StringPool;
+import com.liferay.portal.kernel.dao.search.DisplayTerms;
 import com.liferay.portal.kernel.dao.search.RowChecker;
 import com.liferay.portal.kernel.dao.search.SearchContainer;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.language.LanguageUtil;
+import com.liferay.portal.kernel.portlet.LiferayPortletRequest;
+import com.liferay.portal.kernel.portlet.LiferayPortletResponse;
 import com.liferay.portal.kernel.security.permission.ActionKeys;
 import com.liferay.portal.kernel.security.permission.PermissionChecker;
 import com.liferay.portal.kernel.theme.ThemeDisplay;
@@ -22,10 +25,12 @@ import com.liferay.portal.kernel.util.PortalUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
+import com.liferay.trash.TrashHelper;
 import com.sx.icecap.sss.constants.IcecapSSSActionKeys;
 import com.sx.icecap.sss.constants.IcecapSSSConstants;
 import com.sx.icecap.sss.constants.IcecapSSSWebKeys;
 import com.sx.icecap.sss.constants.IcecapSSSMVCCommands;
+import com.sx.icecap.sss.constants.IcecapSSSTermAttributes;
 import com.sx.icecap.sss.debug.Debug;
 import com.sx.icecap.sss.model.Term;
 import com.sx.icecap.sss.web.term.admin.security.permission.resource.TermModelPermissionHelper;
@@ -40,6 +45,7 @@ import java.util.Locale;
 import java.util.Map;
 
 import javax.portlet.ActionRequest;
+import javax.portlet.MimeResponse.Copy;
 import javax.portlet.PortletURL;
 import javax.portlet.RenderRequest;
 import javax.portlet.RenderResponse;
@@ -51,48 +57,104 @@ public class TermAdminManagementToolbarDisplayContext
 
 	private final ThemeDisplay _themeDisplay;
 	private final String _displayStyle;
-	private String _keywords;
+	private final String _keywords;
+	private final String _orderByCol;
 	private final String _orderByType;
+	private final long _groupId;
+	private final boolean _showAddButton;
+	private final Integer _status;
+	private final String _navigation;
+	private final Boolean _multipleSelection;
+	private final String _eventName;
+	private final Boolean _showScheduled;
+
 	
 	private final String _namespace;
 	private final HttpServletRequest _httpServletRequest;
-	private final TermAdminDisplayContext _termAdminDisplayContext;
 	private final PermissionChecker _permissionChecker;
+	private final TrashHelper _trashHelper;
 	
 	private final Locale _locale;
 
 	public TermAdminManagementToolbarDisplayContext(
-			RenderRequest renderRequest,
-			RenderResponse renderResponse,
-			TermAdminDisplayContext termAdminDisplayContext) {
+			LiferayPortletRequest liferayPortletRequest,
+			LiferayPortletResponse liferayPortletResponse,
+			HttpServletRequest httpServletRequest,
+			SearchContainer<Term> searchContainer,
+			TrashHelper trashHelper) {
 
 		super(
-				termAdminDisplayContext.getLiferayPortletRequest(), 
-				termAdminDisplayContext.getLiferayPortletResponse(), 
-				termAdminDisplayContext.getHttpServletRequest(),
-				termAdminDisplayContext.getSearchContainer());
+				liferayPortletRequest, 
+				liferayPortletResponse, 
+				httpServletRequest,
+				searchContainer);
 		
-		_termAdminDisplayContext = termAdminDisplayContext;
-
+		/* For the scope to search. mine, group, all. It's set in the management toolbar. */
+		_navigation = ParamUtil.getString(httpServletRequest, IcecapSSSWebKeys.NAVIGATION, IcecapSSSConstants.NAVIGATION_MINE);
+		/* For the display style. card, list, table.  It's set in the management toolbar. */
 		_displayStyle = ParamUtil.getString(
-				renderRequest, IcecapSSSWebKeys.DISPLAY_STYLE, IcecapSSSConstants.VIEW_TYPE_TABLE);
-		_orderByType = ParamUtil.getString(
-				renderRequest, IcecapSSSWebKeys.ORDER_BY_TYPE, IcecapSSSConstants.ASC);
-		_keywords = ParamUtil.getString(renderRequest, IcecapSSSWebKeys.KEYWORDS, null);
-		 
-		_httpServletRequest = PortalUtil.getHttpServletRequest(renderRequest);
+				httpServletRequest, IcecapSSSWebKeys.DISPLAY_STYLE, IcecapSSSConstants.VIEW_TYPE_TABLE);
+		/* For sorting by column.  It's set in the management toolbar. */
+		_orderByCol = searchContainer.getOrderByCol();
+		/* For sorting by ascending or descending.  It's set in the management toolbar. */
+		_orderByType = searchContainer.getOrderByType();
+		
+		/* Keywords for searched.  It's set in the management toolbar. */
+		DisplayTerms displayTerms = searchContainer.getSearchTerms();
+		_keywords = Validator.isNotNull(displayTerms) ? displayTerms.getKeywords() : "";
+		
+		/* Status to be displayed.  It's set in the management toolbar.  */
+		_status = ParamUtil.getInteger(httpServletRequest, IcecapSSSTermAttributes.STATUS, WorkflowConstants.STATUS_ANY);
+		
+		/* Show add button or not */
+		_showAddButton = ParamUtil.getBoolean(httpServletRequest, IcecapSSSWebKeys.SHOW_ADD_BUTTON, true);
+		_multipleSelection = ParamUtil.getBoolean( httpServletRequest, IcecapSSSWebKeys.MULTIPLE_SELECTION, true);
+		_showScheduled = ParamUtil.getBoolean(httpServletRequest, IcecapSSSWebKeys.SHOW_SCHEDULED, false);
+		
 		_themeDisplay = (ThemeDisplay)request.getAttribute(WebKeys.THEME_DISPLAY);
 		_namespace = _themeDisplay.getPortletDisplay().getNamespace();
+		_eventName = ParamUtil.getString(
+				httpServletRequest, IcecapSSSWebKeys.EVENT_NAME,
+				_namespace + IcecapSSSWebKeys.SELECT_TERM);
+		
+		_httpServletRequest = httpServletRequest;
 		_locale = _themeDisplay.getLocale();
+		_groupId = _themeDisplay.getScopeGroupId();
 		
 		_permissionChecker = _themeDisplay.getPermissionChecker();
+		_trashHelper = trashHelper;
 		
 	}
 	
 	@Override
 	protected PortletURL getPortletURL() {
-		PortletURL portletURL = _termAdminDisplayContext.getPortletURL();
+		PortletURL portletURL = super.liferayPortletResponse.createRenderURL();
+		
+		portletURL.setParameter(IcecapSSSWebKeys.GROUP_ID, String.valueOf(_groupId));
 
+		if (_getListable() != null) {
+			portletURL.setParameter(IcecapSSSWebKeys.LISTABLE, String.valueOf(_getListable()));
+		}
+
+		portletURL.setParameter( 
+				IcecapSSSWebKeys.MULTIPLE_SELECTION, 
+				String.valueOf(_multipleSelection));
+
+		portletURL.setParameter(IcecapSSSWebKeys.SHOW_ADD_BUTTON, String.valueOf(_showAddButton));
+
+		portletURL.setParameter(
+				IcecapSSSWebKeys.SHOW_SCHEDULED, String.valueOf(_showScheduled));
+
+		portletURL.setParameter(IcecapSSSWebKeys.EVENT_NAME, _eventName);
+		
+		portletURL.setParameter(IcecapSSSWebKeys.DISPLAY_STYLE, _displayStyle);
+		portletURL.setParameter(IcecapSSSWebKeys.ORDER_BY_COL, _orderByCol);
+		portletURL.setParameter(IcecapSSSWebKeys.ORDER_BY_TYPE, _orderByType);
+		portletURL.setParameter(IcecapSSSWebKeys.NAVIGATION, _navigation);
+		portletURL.setParameter(IcecapSSSWebKeys.KEYWORDS, _keywords);
+		
+		portletURL.setParameter(IcecapSSSWebKeys.BACK_URL, PortalUtil.getCurrentURL(_httpServletRequest));
+		
 		return portletURL;
 	}
 
@@ -169,9 +231,9 @@ public class TermAdminManagementToolbarDisplayContext
 		Map<String, Integer> statusMap = new LinkedHashMap<>();
 
 		statusMap.put("Any", Integer.valueOf(WorkflowConstants.STATUS_ANY));
-//		statusMap.put("Draft", Integer.valueOf(WorkflowConstants.STATUS_DRAFT));
 		statusMap.put("Pending", Integer.valueOf(WorkflowConstants.STATUS_PENDING));
 		statusMap.put("Approved", Integer.valueOf(WorkflowConstants.STATUS_APPROVED));
+//		statusMap.put("Draft", Integer.valueOf(WorkflowConstants.STATUS_DRAFT));
 //		statusMap.put("Denied", Integer.valueOf(WorkflowConstants.STATUS_DENIED));
 //		statusMap.put("Scheduled", Integer.valueOf(WorkflowConstants.STATUS_SCHEDULED));
 //		statusMap.put("Expired", Integer.valueOf(WorkflowConstants.STATUS_EXPIRED));
@@ -241,17 +303,43 @@ public class TermAdminManagementToolbarDisplayContext
 		return itemList;
 	}
 	
-	public List<String> getAvailableActions( Term term ){
-		if( Validator.isNull(_termAdminDisplayContext)) {
-			return null;
+	public List<String> getAvailableActions( Term term ) throws PortalException{
+		List<String> availableActions = new ArrayList<>();
+
+		PermissionChecker permissionChecker =
+			_themeDisplay.getPermissionChecker();
+
+		if (TermModelPermissionHelper.contains(
+				permissionChecker, term, IcecapSSSActionKeys.DELETE_TERM)) {
+
+			availableActions.add(IcecapSSSActionKeys.DELETE_TERM);
 		}
 		
-		try {
-			return _termAdminDisplayContext.getAvailableActions(term);
-		} catch (PortalException e) {
-			e.printStackTrace();
-			return null;
+		if (TermModelPermissionHelper.contains(
+				permissionChecker, term, IcecapSSSActionKeys.UPDATE_TERM)) {
+
+			availableActions.add(IcecapSSSActionKeys.UPDATE_TERM);
 		}
+		
+		if (TermModelPermissionHelper.contains(
+				permissionChecker, term, IcecapSSSActionKeys.ADD_TERM)) {
+
+			availableActions.add(IcecapSSSActionKeys.ADD_TERM);
+		}
+
+		if (TermModelPermissionHelper.contains(
+				permissionChecker, term, IcecapSSSActionKeys.REVIEW_TERM)) {
+
+			availableActions.add(IcecapSSSActionKeys.REVIEW_TERM);
+		}
+
+		if (TermModelPermissionHelper.contains(
+				permissionChecker, term, IcecapSSSActionKeys.APPROVE_TERM)) {
+
+			availableActions.add(IcecapSSSActionKeys.APPROVE_TERM);
+		}
+		
+		return availableActions;
 	}
 	
 	public String getBulkActionURL() {
@@ -272,7 +360,6 @@ public class TermAdminManagementToolbarDisplayContext
 										getPortletURL(), 
 										IcecapSSSWebKeys.MVC_RENDER_COMMAND_NAME, IcecapSSSMVCCommands.RENDER_ADMIN_TERM_EDIT, 
 										Constants.CMD, Constants.UPDATE,
-										IcecapSSSWebKeys.REDIRECT, _getRedirectURL(), 
 										IcecapSSSWebKeys.TERM_ID, termId);
 
 									dropdownItem.setIcon("edit");
@@ -397,9 +484,8 @@ public class TermAdminManagementToolbarDisplayContext
 		
 		RenderURL renderURL = liferayPortletResponse.createRenderURL();
 		
-		String keywords = _termAdminDisplayContext.getKeywords();
 		String renderCommand = IcecapSSSMVCCommands.RENDER_ADMIN_TERM_LIST;
-		if( Validator.isNotNull(keywords) && !keywords.isEmpty() ) {
+		if( Validator.isNotNull(_keywords) && !_keywords.isEmpty() ) {
 			renderCommand = IcecapSSSMVCCommands.RENDER_ADMIN_SEARCH_TERMS;
 		}
 		
@@ -410,7 +496,7 @@ public class TermAdminManagementToolbarDisplayContext
 			viewType.setHref(renderURL,
 						IcecapSSSWebKeys.MVC_RENDER_COMMAND_NAME, renderCommand,
 						IcecapSSSWebKeys.DISPLAY_STYLE, IcecapSSSConstants.VIEW_TYPE_CARDS,
-						IcecapSSSWebKeys.KEYWORDS, keywords);
+						IcecapSSSWebKeys.KEYWORDS, _keywords);
 			viewType.setIcon("cards2");
 			viewType.setLabel(LanguageUtil.get(LocaleUtil.getMostRelevantLocale(), "cards"));
 			viewTypeItemList.add(viewType);
@@ -423,7 +509,7 @@ public class TermAdminManagementToolbarDisplayContext
 			viewType.setHref(renderURL,
 						IcecapSSSWebKeys.MVC_RENDER_COMMAND_NAME, renderCommand,
 						IcecapSSSWebKeys.DISPLAY_STYLE, IcecapSSSConstants.VIEW_TYPE_LIST,
-						IcecapSSSWebKeys.KEYWORDS, keywords);
+						IcecapSSSWebKeys.KEYWORDS, _keywords);
 			viewType.setIcon("list");
 			viewType.setLabel(LanguageUtil.get(LocaleUtil.getMostRelevantLocale(), "list"));
 			viewTypeItemList.add(viewType);
@@ -436,7 +522,7 @@ public class TermAdminManagementToolbarDisplayContext
 			viewType.setHref(renderURL,
 						IcecapSSSWebKeys.MVC_RENDER_COMMAND_NAME, renderCommand,
 						IcecapSSSWebKeys.DISPLAY_STYLE, IcecapSSSConstants.VIEW_TYPE_TABLE,
-						IcecapSSSWebKeys.KEYWORDS, keywords);
+						IcecapSSSWebKeys.KEYWORDS, _keywords);
 			viewType.setIcon("table");
 			viewType.setLabel(LanguageUtil.get(LocaleUtil.getMostRelevantLocale(), "table"));
 			viewTypeItemList.add(viewType);
@@ -452,7 +538,7 @@ public class TermAdminManagementToolbarDisplayContext
 
 	@Override
 	protected String getDisplayStyle() {
-		return _termAdminDisplayContext.getDisplayStyle();
+		return _displayStyle;
 	}
 
 	@Override
@@ -562,4 +648,19 @@ public class TermAdminManagementToolbarDisplayContext
 		}
 		return super.getDefaultEventHandler();
 	}
+	
+	private Boolean _getListable() {
+		Boolean listable = null;
+
+		String listableValue = ParamUtil.getString(
+			super.liferayPortletRequest, IcecapSSSWebKeys.LISTABLE, null);
+
+		if (Validator.isNotNull(listableValue)) {
+			listable = ParamUtil.getBoolean(
+					super.liferayPortletRequest, IcecapSSSWebKeys.LISTABLE, true);
+		}
+
+		return listable;
+	}
+
 }

@@ -1,2 +1,21 @@
 .SXIcecapSSS-web {
+	.hide {
+		display:none;
+	}
+
+	.show {
+		display:block;
+	}
+
+	.card-horizontal {
+		margin-bottom: 0px;
+	}
+
+	.form-group {
+    	margin-bottom: 1.0rem;
+	}
+	
+	.show-border{ 
+		border: solid #bbb 1px;
+	} 
 }

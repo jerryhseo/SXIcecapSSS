@@ -21,7 +21,11 @@
 		<field localized="true" name="displayName" type="String" />
 		<field localized="true" name="definition" type="String" />
 		<field localized="true" name="tooltip" type="String" />
-		<field name="synonyms" type="String" />
-		<field name="attributesJSON" type="String" />
+		<field name="synonyms" type="String">
+			<hint name="max-length">512</hint>
+		</field>
+		<field name="attributesJSON" type="String">
+			<hint name="max-length">1024</hint>
+		</field>
 	</model>
 </model-hints>

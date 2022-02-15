@@ -37,6 +37,7 @@ public class SearchTermsRenderCommand implements MVCRenderCommand {
 		
 		Debug.printHeader("SearchTermsRenderCommand");
 		
+		/*
 		Enumeration<String> keys = renderRequest.getParameterNames();
 		while( keys.hasMoreElements() ) {
 			String key = keys.nextElement();
@@ -60,7 +61,7 @@ public class SearchTermsRenderCommand implements MVCRenderCommand {
 		renderRequest.setAttribute(
 				TermAdminManagementToolbarDisplayContext.class.getName(), 
 				termAdminManagementToolbarDisplayContext );
-		
+		*/
 		Debug.printFooter("SearchTermsRenderCommand");
 		return IcecapSSSJsps.ADMIN_TERM_LIST_JSP;
 	}

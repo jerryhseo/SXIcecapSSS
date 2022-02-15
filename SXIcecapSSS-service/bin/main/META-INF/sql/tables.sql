@@ -18,6 +18,6 @@ create table sxicecapsss_Term (
 	displayName STRING null,
 	definition STRING null,
 	tooltip STRING null,
-	synonyms VARCHAR(75) null,
-	attributesJSON VARCHAR(75) null
+	synonyms VARCHAR(512) null,
+	attributesJSON VARCHAR(1024) null
 );

@@ -15,7 +15,7 @@ import javax.portlet.PortletRequest;
 
 public class IcecapSSSTermAttributeUtil {
 	public static final int DEFAULT_STRING_MIN_LENGTH = 1;
-	public static final int DEFAULT_STRING_MAX_LENGTH = 32;
+	public static final int DEFAULT_STRING_MAX_LENGTH = 64;
 	public static final boolean DEFAULT_STRING_NEW_LINE = false;
 	
 	public static String getTypeDedicatedAttributes( PortletRequest portletRequest, String termType ) throws Exception {
