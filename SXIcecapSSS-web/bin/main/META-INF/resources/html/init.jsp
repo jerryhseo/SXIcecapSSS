@@ -19,6 +19,6 @@
 
 <%
 	String currentURL = themeDisplay.getURLCurrent();
-	String backURL = ParamUtil.getString(renderRequest, "BACK_URL", "");
+	String backURL = ParamUtil.getString(renderRequest, "backURL", "");
 	String redirect = ParamUtil.getString(renderRequest, "redirect", "");;
 %>

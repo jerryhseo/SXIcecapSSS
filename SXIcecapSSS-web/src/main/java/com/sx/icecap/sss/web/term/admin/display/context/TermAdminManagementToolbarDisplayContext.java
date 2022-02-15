@@ -153,8 +153,6 @@ public class TermAdminManagementToolbarDisplayContext
 		portletURL.setParameter(IcecapSSSWebKeys.NAVIGATION, _navigation);
 		portletURL.setParameter(IcecapSSSWebKeys.KEYWORDS, _keywords);
 		
-		portletURL.setParameter(IcecapSSSWebKeys.BACK_URL, PortalUtil.getCurrentURL(_httpServletRequest));
-		
 		return portletURL;
 	}
 
@@ -169,11 +167,11 @@ public class TermAdminManagementToolbarDisplayContext
 	
 	@Override
 	public String getSearchContainerId() {
-		Debug.printHeader("TermAdminManagementToolbarDisplayContext.getSearchContainerId()");
+//		Debug.printHeader("TermAdminManagementToolbarDisplayContext.getSearchContainerId()");
 //		String searchContainerId = _termAdminDisplayContext.getSearchContainerId();
 		String searchContainerId = super.searchContainer.getId( _httpServletRequest, _namespace);
 		
-		Debug.printFooter("TermAdminManagementToolbarDisplayContext.getSearchContainerId()");
+//		Debug.printFooter("TermAdminManagementToolbarDisplayContext.getSearchContainerId()");
 		return searchContainerId;
 	}
 	
@@ -183,17 +181,17 @@ public class TermAdminManagementToolbarDisplayContext
 	
 	@Override
 	public String getSearchActionURL() {
-		Debug.printHeader("TermAdminManagementToolbarDisplayContext.getSearchActionURL()");
+//		Debug.printHeader("TermAdminManagementToolbarDisplayContext.getSearchActionURL()");
 		PortletURL searchURL =  getPortletURL();
 		
 		searchURL.setParameter(
 				IcecapSSSWebKeys.MVC_RENDER_COMMAND_NAME, 
 				IcecapSSSMVCCommands.RENDER_ADMIN_TERM_LIST);
 		
-		System.out.println("Order By Type: "+ _orderByType);
+//		System.out.println("Order By Type: "+ _orderByType);
 		
 		
-		Debug.printFooter("TermAdminManagementToolbarDisplayContext.getSearchActionURL()");
+//		Debug.printFooter("TermAdminManagementToolbarDisplayContext.getSearchActionURL()");
 
 		return searchURL.toString();
 	}
@@ -407,7 +405,7 @@ public class TermAdminManagementToolbarDisplayContext
 									dropdownItem.setHref(
 											getPortletURL(),
 											IcecapSSSWebKeys.MVC_RENDER_COMMAND_NAME, IcecapSSSMVCCommands.RENDER_ADMIN_TERM_EDIT,
-											IcecapSSSWebKeys.REDIRECT, currentURLObj.toString(),
+											IcecapSSSWebKeys.REDIRECT, getPortletURL().toString(),
 											Constants.CMD, Constants.ADD);
 									dropdownItem.setLabel(
 											LanguageUtil.get(request, "add-term"));

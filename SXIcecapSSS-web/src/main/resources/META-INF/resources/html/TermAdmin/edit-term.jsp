@@ -97,9 +97,6 @@
 		<aui:col md="7">
 		</aui:col>
 		<aui:col md="2" >
-			<%
-			out.println( "backURL: "+backURL );
-			%>
 			<clay:link href="<%=backURL %>" icon="list" label="view-term-list" />
 		</aui:col>
 	</aui:row>
