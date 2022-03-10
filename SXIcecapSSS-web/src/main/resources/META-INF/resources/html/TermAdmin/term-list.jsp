@@ -1,4 +1,5 @@
 
+<%@page import="com.sx.icecap.sss.debug.Debug"%>
 <%@page import="com.liferay.portal.kernel.util.DateUtil"%>
 <%@page import="java.util.Date"%>
 <%@page import="com.sx.icecap.sss.web.term.admin.taglib.clay.TermVerticalCard"%>
@@ -28,6 +29,13 @@
 									renderRequest, 
 									IcecapSSSWebKeys.DISPLAY_STYLE, 
 									IcecapSSSConstants.VIEW_TYPE_TABLE);
+	
+	Debug.printHeader("term-list");
+	Debug.printAllParameters(renderRequest);
+	
+	System.out.println( request.getContextPath());
+	Debug.printFooter("term-list");
+
 %>
 
 <portlet:renderURL var="addTermURL">
@@ -35,7 +43,7 @@
     		name="<%=IcecapSSSWebKeys.MVC_RENDER_COMMAND_NAME%>" 
     		value="<%=IcecapSSSMVCCommands.RENDER_ADMIN_TERM_EDIT%>"/>
     <portlet:param 
-    		name="<%=IcecapSSSWebKeys.REDIRECT%>" 
+    		name="<%=IcecapSSSWebKeys.BACK_URL%>" 
     		value="<%=currentURL%>"/>
 </portlet:renderURL>
 

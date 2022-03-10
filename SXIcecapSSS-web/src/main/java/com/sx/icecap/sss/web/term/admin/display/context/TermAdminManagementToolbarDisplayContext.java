@@ -400,12 +400,13 @@ public class TermAdminManagementToolbarDisplayContext
 		CreationMenu menu = 
 				new CreationMenu() {
 					{
+						String backURL = getPortletURL().toString();
+						
 						addDropdownItem(
 								dropdownItem -> {
 									dropdownItem.setHref(
 											getPortletURL(),
 											IcecapSSSWebKeys.MVC_RENDER_COMMAND_NAME, IcecapSSSMVCCommands.RENDER_ADMIN_TERM_EDIT,
-											IcecapSSSWebKeys.REDIRECT, getPortletURL().toString(),
 											Constants.CMD, Constants.ADD);
 									dropdownItem.setLabel(
 											LanguageUtil.get(request, "add-term"));

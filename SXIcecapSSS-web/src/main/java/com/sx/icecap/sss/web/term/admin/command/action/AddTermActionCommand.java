@@ -42,8 +42,6 @@ public class AddTermActionCommand extends BaseMVCActionCommand {
 
 		String termType = ParamUtil.getString(actionRequest, IcecapSSSWebKeys.SELECTED_TERM_TYPE);
 		
-		System.out.println("Term Type: "+termType);
-		
 		ServiceContext sc = ServiceContextFactory.getInstance(Term.class.getName(), actionRequest);
 		long[] categoryIds = sc.getAssetCategoryIds();
 		
@@ -57,6 +55,7 @@ public class AddTermActionCommand extends BaseMVCActionCommand {
 		String dedicatedAttributes = IcecapSSSTermAttributeUtil.getTypeDedicatedAttributes(actionRequest, termType);
 		
 		System.out.println("=== Term Attributes ===");
+		System.out.println(IcecapSSSTermAttributes.TERM_TYPE+": "+termType);
 		System.out.println(IcecapSSSTermAttributes.TERM_NAME+": "+name);
 		System.out.println(IcecapSSSTermAttributes.TERM_VERSION+": "+version);
 		System.out.println(IcecapSSSTermAttributes.DISPLAY_NAME+": "+IcecapSSSTermAttributeUtil.convertLocalizedMapToJson(displayNameMap));
@@ -65,6 +64,7 @@ public class AddTermActionCommand extends BaseMVCActionCommand {
 		System.out.println(IcecapSSSTermAttributes.TOOLTIP+": "+IcecapSSSTermAttributeUtil.convertLocalizedMapToJson(tooltipMap));
 		System.out.println("Dedicated Attributes: "+dedicatedAttributes);
 		System.out.println("Category Count: "+categoryIds.length);
+		
 		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
 		for( long categoryId : categoryIds ) {
 			AssetCategory category = AssetCategoryLocalServiceUtil.getCategory(categoryId);

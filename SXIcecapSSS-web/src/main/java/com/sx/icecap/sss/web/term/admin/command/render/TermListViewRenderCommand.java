@@ -108,8 +108,9 @@ public class TermListViewRenderCommand implements MVCRenderCommand {
 		renderRequest.setAttribute(
 				TermAdminManagementToolbarDisplayContext.class.getName(), 
 				termAdminManagementToolbarDisplayContext );
-		
+		Debug.printHeader("TermListViewRenderCommand.render()");
 		Debug.printAllParameters(renderRequest);
+		Debug.printFooter("TermListViewRenderCommand.render()");
 		return IcecapSSSJsps.ADMIN_TERM_LIST_JSP;
 	}
 

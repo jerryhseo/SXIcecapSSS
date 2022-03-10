@@ -28,6 +28,7 @@ public class IcecapSSSWebKeys {
 	public static final String SHOW_ADD_BUTTON = "showAddButton";
 	public static final String SHOW_BACK = "showBack";
 	public static final String SHOW_SCHEDULED = "showScheduled";
+	public static final String STATUS = "status";
 	public static final String STRING_UTIL = "stringUtil";
 	public static final String TAG = "tag";
 	public static final String TAGS = "tags";

@@ -19,4 +19,6 @@ public class IcecapSSSMVCCommands {
 	public static final String ACTION_ADMIN_LOAD_TERM_ATTRIBURES = "/html/TermAdmin/load-term-attributes";
 	public static final String ACTION_ADMIN_SEARCH_TERMS = "/html/TermAdmin/search-terms";
 	public static final String ACTION_ADMIN_BULK_ACTIONS = "/html/TermAdmin/bulk-actions";
+
+	public static final String RESOURCE_ADMIN_RENDER_TERM = "/html/TermAdmin/render-term";
 }

@@ -1,3 +1,5 @@
+<%@page import="com.liferay.portal.kernel.workflow.WorkflowConstants"%>
+<%@page import="com.sx.icecap.sss.debug.Debug"%>
 <%@page import="com.sx.icecap.sss.util.term.IcecapSSSTermAttributeUtil"%>
 <%@page import="com.liferay.portal.kernel.json.JSONFactoryUtil"%>
 <%@page import="com.liferay.portal.kernel.json.JSONObject"%>
@@ -21,6 +23,7 @@
 <%@ include file="../init.jsp" %>
 
 <link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/css/main.css">
+<script src="<%=request.getContextPath()%>/js/station-x.js"></script>
 
 <%
 	Term term = (Term)renderRequest.getAttribute(IcecapSSSWebKeys.TERM);
@@ -46,15 +49,45 @@
 		availableLanguageIds.add("\""+LanguageUtil.getLanguageId(availableLocale)+"\"");
 	}
 	
-	System.out.println("Default Term Type: "+defaultTermType);
-%>
-<style>
+	Debug.printHeader("edit-term");
+	Debug.printAllParameters(renderRequest);
+	Debug.printFooter("edit-term");
 
-</style>
+%>
 
 <div class="SXIcecapSSS-web">
 <liferay-portlet:actionURL name="<%=IcecapSSSMVCCommands.ACTION_ADMIN_TERM_ADD%>" var="addTermURL">
 </liferay-portlet:actionURL>
+
+<portlet:renderURL var="termListURL">
+	<portlet:param
+			name="<%=IcecapSSSWebKeys.MVC_RENDER_COMMAND_NAME%>" 
+    		value="<%=IcecapSSSMVCCommands.RENDER_ADMIN_TERM_LIST%>" />
+    <portlet:param
+    		name="<%=  IcecapSSSWebKeys.NAVIGATION %>"
+    		value="<%= ParamUtil.getString(renderRequest, IcecapSSSWebKeys.NAVIGATION) %>" />
+    <portlet:param
+    		name="<%=  IcecapSSSWebKeys.DISPLAY_STYLE %>"
+    		value="<%= ParamUtil.getString(renderRequest, IcecapSSSWebKeys.DISPLAY_STYLE) %>" />
+    <portlet:param
+    		name="<%=  IcecapSSSWebKeys.KEYWORDS %>"
+    		value="<%= ParamUtil.getString(renderRequest, IcecapSSSWebKeys.KEYWORDS) %>" />
+    <portlet:param
+    		name="<%=  IcecapSSSWebKeys.ORDER_BY_COL %>"
+    		value="<%= ParamUtil.getString(renderRequest, IcecapSSSWebKeys.ORDER_BY_COL) %>" />
+    <portlet:param
+    		name="<%=  IcecapSSSWebKeys.ORDER_BY_TYPE %>"
+    		value="<%= ParamUtil.getString(renderRequest, IcecapSSSWebKeys.ORDER_BY_TYPE) %>" />
+    <portlet:param
+    		name="<%=  IcecapSSSWebKeys.SHOW_SCHEDULED %>"
+    		value="<%= ParamUtil.getString(renderRequest, IcecapSSSWebKeys.SHOW_SCHEDULED) %>" />
+    <portlet:param
+    		name="<%=  IcecapSSSWebKeys.MULTIPLE_SELECTION %>"
+    		value="<%= ParamUtil.getString(renderRequest, IcecapSSSWebKeys.MULTIPLE_SELECTION) %>" />
+    <portlet:param
+    		name="<%=  IcecapSSSWebKeys.STATUS %>"
+    		value="<%= ParamUtil.getString(renderRequest, IcecapSSSWebKeys.STATUS, String.valueOf(WorkflowConstants.STATUS_ANY)) %>" />
+</portlet:renderURL>
 
 <portlet:actionURL name="<%=IcecapSSSMVCCommands.ACTION_ADMIN_TERM_UPDATE%>" var="updateTermURL">
 </portlet:actionURL>
@@ -97,7 +130,7 @@
 		<aui:col md="7">
 		</aui:col>
 		<aui:col md="2" >
-			<clay:link href="<%=backURL %>" icon="list" label="view-term-list" />
+			<clay:link href="<%= termListURL.toString() %>" icon="list" label="view-term-list" />
 		</aui:col>
 	</aui:row>
 </aui:container>
@@ -179,7 +212,7 @@
 	<aui:row>
 		<aui:col>
 			<aui:fieldset-group markupView="lexicon">
-				<aui:fieldset collapsed="<%= true %>" collapsible="<%= true %>" label="categorization" helpMessage="term-categories-help">
+				<aui:fieldset collapsed="<%= false %>" collapsible="<%= true %>" label="categorization" helpMessage="term-categories-help">
 					<liferay-asset:asset-categories-selector 
 								className="<%=Term.class.getName()%>" 
 								classPK="<%= Validator.isNotNull(term)?term.getTermId():0 %>"/>
@@ -196,13 +229,21 @@
 			</portlet:actionURL>
 			<aui:button name="delete" type="delete" value="delete" href="<%= deleteTermURL.toString() %>"></aui:button>
 		</c:if>
-		<aui:button name="cancel" value="cancel" href="<%= backURL %>"></aui:button>
+		<aui:button name="cancel" value="cancel" href="<%= termListURL %>"></aui:button>
 	</aui:button-row>
 </aui:form>
 </aui:container>
 
 <script>
+
+	let SX = new StationX('<portlet:namespace/>');
+	let sssTerm = SX.getSSSTerm();
+	
+	sssTerm.termType = SXIcecapSSSTermTypes.STRING;
+	console.log( 'term type: '+sssTerm.termType );
+
 $(document).ready(function(){
+	
 	var hasDedicatedAttributes = function( termType ){
 		if( termType === '<%= IcecapSSSTermTypes.EMAIL%>' ||
 			 termType === '<%= IcecapSSSTermTypes.DATE %>' )

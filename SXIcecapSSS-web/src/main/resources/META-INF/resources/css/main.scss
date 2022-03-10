@@ -12,10 +12,18 @@
 	}
 
 	.form-group {
-    	margin-bottom: 1.0rem;
+    	margin-bottom: 0.5rem;
+	}
+
+	.form-control {
+		margin-bottom: 0.5rem;
 	}
 	
 	.show-border{ 
 		border: solid #bbb 1px;
-	} 
+	}
+
+	.lfr-ddm-field-group {
+		margin-bottom: 5px;
+	}
 }
