@@ -26,6 +26,7 @@
 <script src="<%=request.getContextPath()%>/js/station-x.js"></script>
 
 <%
+	
 	Term term = (Term)renderRequest.getAttribute(IcecapSSSWebKeys.TERM);
 
 	String cmd = ParamUtil.getString(renderRequest, Constants.CMD, Constants.ADD);
@@ -93,6 +94,8 @@
 </portlet:actionURL>
 
 <portlet:actionURL name="<%=IcecapSSSMVCCommands.ACTION_ADMIN_LOAD_TERM_ATTRIBURES%>" var="loadTermAttributesURL"/>
+
+<portlet:resourceURL id="<%= IcecapSSSMVCCommands.RESOURCE_ADMIN_RENDER_TERM %>", var="renderTermURL"></portlet:resourceURL>
 
 
 <liferay-asset:asset-categories-error />
@@ -236,11 +239,18 @@
 
 <script>
 
-	let SX = new StationX('<portlet:namespace/>');
-	let sssTerm = SX.getSSSTerm();
+if( StationX ){
+	StationX.setNamespace( '<portlet:namespace/>');
 	
-	sssTerm.termType = SXIcecapSSSTermTypes.STRING;
-	console.log( 'term type: '+sssTerm.termType );
+	console.log('StationX exist: '+ StationX.getNamespace() );
+	let term = StationX.StringTerm();
+	console.log( 'Term Namespace: '+term.namespace );
+	console.log( 'Term Type: '+term.termType );
+	
+}
+else{
+	console.log('Something wrong....');
+}
 
 $(document).ready(function(){
 	
