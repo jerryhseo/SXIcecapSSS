@@ -13,7 +13,7 @@
 			</aui:row>
 			<aui:row>
 				<aui:col>
-					<%@include file="attributes/new-line.jspf" %>
+					<%@include file="attributes/multi-line.jspf" %>
 				</aui:col>
 			</aui:row>
 			<aui:row>

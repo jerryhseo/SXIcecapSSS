@@ -251,8 +251,8 @@ public class IcecapSSSTermAttributeUtil {
 		
 		String minValue = ParamUtil.getString(portletRequest, IcecapSSSTermAttributes.MIN_VALUE);
 		String maxValue = ParamUtil.getString(portletRequest, IcecapSSSTermAttributes.MAX_VALUE);
-		boolean lowerBoundary = ParamUtil.getBoolean(portletRequest, IcecapSSSTermAttributes.LOWER_BOUNDARY);
-		boolean upperBoundary = ParamUtil.getBoolean(portletRequest, IcecapSSSTermAttributes.UPPER_BOUNDARY);
+		boolean lowerBoundary = ParamUtil.getBoolean(portletRequest, IcecapSSSTermAttributes.MIN_BOUNDARY);
+		boolean upperBoundary = ParamUtil.getBoolean(portletRequest, IcecapSSSTermAttributes.MAX_BOUNDARY);
 		String unit = ParamUtil.getString(portletRequest, IcecapSSSTermAttributes.UNIT);
 		boolean uncertainty = ParamUtil.getBoolean(portletRequest, IcecapSSSTermAttributes.UNCERTAINTY);
 		boolean sweepable = ParamUtil.getBoolean(portletRequest, IcecapSSSTermAttributes.SWEEPABLE);
@@ -263,9 +263,9 @@ public class IcecapSSSTermAttributeUtil {
 		if( !maxValue.isEmpty() )
 			jsonAttr.put(IcecapSSSTermAttributes.MAX_VALUE, maxValue);
 		if( !minValue.isEmpty() )
-			jsonAttr.put(IcecapSSSTermAttributes.LOWER_BOUNDARY, lowerBoundary);
+			jsonAttr.put(IcecapSSSTermAttributes.MIN_BOUNDARY, lowerBoundary);
 		if( !maxValue.isEmpty() )
-			jsonAttr.put(IcecapSSSTermAttributes.UPPER_BOUNDARY, upperBoundary);
+			jsonAttr.put(IcecapSSSTermAttributes.MAX_BOUNDARY, upperBoundary);
 		if( !unit.isEmpty() )
 			jsonAttr.put(IcecapSSSTermAttributes.UNIT, unit);
 		jsonAttr.put(IcecapSSSTermAttributes.UNCERTAINTY, uncertainty);
@@ -278,7 +278,7 @@ public class IcecapSSSTermAttributeUtil {
 		
 		int minLength = ParamUtil.getInteger(portletRequest, IcecapSSSTermAttributes.MIN_LENGTH);
 		int maxLength = ParamUtil.getInteger(portletRequest, IcecapSSSTermAttributes.MAX_LENGTH);
-		boolean newLine = ParamUtil.getBoolean(portletRequest, IcecapSSSTermAttributes.NEW_LINE);
+		boolean multiLine = ParamUtil.getBoolean(portletRequest, IcecapSSSTermAttributes.MULTI_LINE);
 		String validationRule = ParamUtil.getString(portletRequest, IcecapSSSTermAttributes.VALIDATION_RULE);
 		
 		JSONObject jsonAttr = JSONFactoryUtil.createJSONObject();
@@ -286,8 +286,8 @@ public class IcecapSSSTermAttributeUtil {
 			jsonAttr.put(IcecapSSSTermAttributes.MIN_LENGTH, minLength);
 		if( maxLength > minLength &&  maxLength != DEFAULT_STRING_MAX_LENGTH )
 			jsonAttr.put(IcecapSSSTermAttributes.MAX_LENGTH, maxLength);
-		if( newLine != DEFAULT_STRING_NEW_LINE )
-			jsonAttr.put(IcecapSSSTermAttributes.NEW_LINE, newLine);
+		if( multiLine != DEFAULT_STRING_NEW_LINE )
+			jsonAttr.put(IcecapSSSTermAttributes.MULTI_LINE, multiLine);
 		if( !validationRule.isEmpty() )
 			jsonAttr.put(IcecapSSSTermAttributes.VALIDATION_RULE, validationRule);
 		

@@ -3,8 +3,10 @@ package com.sx.icecap.sss.constants;
 public class IcecapSSSTermTypes {
 	public static final String STRING = "String";
 	public static final String NUMERIC = "Numeric";
+	public static final String INTEGER = "Integer";
 	public static final String BOOLEAN = "Boolean";
 	public static final String LIST = "List";
+	public static final String ADDRESS = "Address";
 	public static final String ARRAY = "Array";
 	public static final String DATE = "Date";
 	public static final String PHONE = "Phone";
@@ -22,7 +24,7 @@ public class IcecapSSSTermTypes {
 	
 	public static final String[] getTypes() {
 		String[] types = {
-				STRING, NUMERIC, BOOLEAN, LIST, ARRAY, DATE, PHONE, EMAIL, LIST_ARRAY, MATRIX, FILE, FILE_ARRAY, OBJECT, OBJECT_ARRAY, DATA_LINK, DATA_LINK_ARRAY, GROUP, COMMENT 
+				STRING, NUMERIC, BOOLEAN, INTEGER, ADDRESS, LIST, ARRAY, DATE, PHONE, EMAIL, LIST_ARRAY, MATRIX, FILE, FILE_ARRAY, OBJECT, OBJECT_ARRAY, DATA_LINK, DATA_LINK_ARRAY, GROUP, COMMENT 
 		};
 		return types;
 	}

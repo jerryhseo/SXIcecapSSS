@@ -1,3 +1,5 @@
+<%@page import="com.liferay.portal.kernel.json.JSONArray"%>
+<%@page import="com.liferay.portal.kernel.util.PortalUtil"%>
 <%@page import="com.liferay.portal.kernel.workflow.WorkflowConstants"%>
 <%@page import="com.sx.icecap.sss.debug.Debug"%>
 <%@page import="com.sx.icecap.sss.util.term.IcecapSSSTermAttributeUtil"%>
@@ -23,7 +25,6 @@
 <%@ include file="../init.jsp" %>
 
 <link rel="stylesheet" type="text/css" href="<%=request.getContextPath()%>/css/main.css">
-<script src="<%=request.getContextPath()%>/js/station-x.js"></script>
 
 <%
 	
@@ -44,15 +45,12 @@
 		defaultTermType = term.getTermType();
 	}
 	
-	Set<Locale> availableLocales = LanguageUtil.getAvailableLocales(); 	
-	List<String>  availableLanguageIds = new ArrayList<>();
-	for( Locale availableLocale : availableLocales ){
-		availableLanguageIds.add("\""+LanguageUtil.getLanguageId(availableLocale)+"\"");
-	}
+	Locale defaultLocale = PortalUtil.getSiteDefaultLocale(themeDisplay.getScopeGroupId());
 	
-	Debug.printHeader("edit-term");
-	Debug.printAllParameters(renderRequest);
-	Debug.printFooter("edit-term");
+	Set<Locale> availableLocales = LanguageUtil.getAvailableLocales();
+	
+	JSONArray jsonLocales = JSONFactoryUtil.createJSONArray();
+	availableLocales.forEach( jsonLocales::put );
 
 %>
 
@@ -95,7 +93,7 @@
 
 <portlet:actionURL name="<%=IcecapSSSMVCCommands.ACTION_ADMIN_LOAD_TERM_ATTRIBURES%>" var="loadTermAttributesURL"/>
 
-<portlet:resourceURL id="<%= IcecapSSSMVCCommands.RESOURCE_ADMIN_RENDER_TERM %>", var="renderTermURL"></portlet:resourceURL>
+<portlet:resourceURL id="<%= IcecapSSSMVCCommands.RESOURCE_ADMIN_RENDER_TERM %>" var="renderTermURL"></portlet:resourceURL>
 
 
 <liferay-asset:asset-categories-error />
@@ -238,21 +236,12 @@
 </aui:container>
 
 <script>
-
-if( StationX ){
-	StationX.setNamespace( '<portlet:namespace/>');
-	
-	console.log('StationX exist: '+ StationX.getNamespace() );
-	let term = StationX.StringTerm();
-	console.log( 'Term Namespace: '+term.namespace );
-	console.log( 'Term Type: '+term.termType );
-	
-}
-else{
-	console.log('Something wrong....');
-}
-
 $(document).ready(function(){
+	let SX = StationX(  '<portlet:namespace/>', 
+			'<%= defaultLocale.toString() %>',
+			'<%= locale.toString() %>',
+			<%= jsonLocales.toJSONString() %> );
+
 	
 	var hasDedicatedAttributes = function( termType ){
 		if( termType === '<%= IcecapSSSTermTypes.EMAIL%>' ||
