@@ -1861,6 +1861,56 @@ public interface TermPersistence extends BasePersistence<Term> {
 	public int countByName(String termName);
 
 	/**
+	 * Returns the term where termName = &#63; and termVersion = &#63; or throws a <code>NoSuchTermException</code> if it could not be found.
+	 *
+	 * @param termName the term name
+	 * @param termVersion the term version
+	 * @return the matching term
+	 * @throws NoSuchTermException if a matching term could not be found
+	 */
+	public Term findByNameVersion(String termName, String termVersion)
+		throws NoSuchTermException;
+
+	/**
+	 * Returns the term where termName = &#63; and termVersion = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	 *
+	 * @param termName the term name
+	 * @param termVersion the term version
+	 * @return the matching term, or <code>null</code> if a matching term could not be found
+	 */
+	public Term fetchByNameVersion(String termName, String termVersion);
+
+	/**
+	 * Returns the term where termName = &#63; and termVersion = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	 *
+	 * @param termName the term name
+	 * @param termVersion the term version
+	 * @param useFinderCache whether to use the finder cache
+	 * @return the matching term, or <code>null</code> if a matching term could not be found
+	 */
+	public Term fetchByNameVersion(
+		String termName, String termVersion, boolean useFinderCache);
+
+	/**
+	 * Removes the term where termName = &#63; and termVersion = &#63; from the database.
+	 *
+	 * @param termName the term name
+	 * @param termVersion the term version
+	 * @return the term that was removed
+	 */
+	public Term removeByNameVersion(String termName, String termVersion)
+		throws NoSuchTermException;
+
+	/**
+	 * Returns the number of terms where termName = &#63; and termVersion = &#63;.
+	 *
+	 * @param termName the term name
+	 * @param termVersion the term version
+	 * @return the number of matching terms
+	 */
+	public int countByNameVersion(String termName, String termVersion);
+
+	/**
 	 * Caches the term in the entity cache if it is enabled.
 	 *
 	 * @param term the term

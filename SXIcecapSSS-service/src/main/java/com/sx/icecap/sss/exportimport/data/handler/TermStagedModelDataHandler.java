@@ -81,6 +81,7 @@ public class TermStagedModelDataHandler extends BaseStagedModelDataHandler<Term>
 						term.getTooltipMap(),
 						term.getSynonyms(),
 						term.getAttributesJSON(),
+						term.getGroupTermId(),
 						term.getStatus(),
 						serviceContext);
 			}
@@ -94,8 +95,9 @@ public class TermStagedModelDataHandler extends BaseStagedModelDataHandler<Term>
 						term.getDefinitionMap(),
 						term.getTooltipMap(),
 						term.getSynonyms(),
-						term.getStatus(),
 						term.getAttributesJSON(),
+						term.getGroupTermId(),
+						term.getStatus(),
 						serviceContext);
 
 			}
@@ -110,6 +112,7 @@ public class TermStagedModelDataHandler extends BaseStagedModelDataHandler<Term>
 					term.getTooltipMap(),
 					term.getSynonyms(),
 					term.getAttributesJSON(),
+					term.getGroupTermId(),
 					term.getStatus(),
 					serviceContext);
 		}

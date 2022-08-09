@@ -75,7 +75,8 @@ public interface TermLocalService
 			String termName, String termVersion, String termType,
 			Map<Locale, String> displayNameMap,
 			Map<Locale, String> definitionMap, Map<Locale, String> tooltipMap,
-			String synonyms, String attributes, int status, ServiceContext sc)
+			String synonyms, String attributes, String groupTermId, int status,
+			ServiceContext sc)
 		throws PortalException;
 
 	/**
@@ -309,6 +310,10 @@ public interface TermLocalService
 	public Term getTermByUuidAndGroupId(String uuid, long groupId)
 		throws PortalException;
 
+	@Transactional(propagation = Propagation.SUPPORTS, readOnly = true)
+	public long getTermIdByNameVersion(String termName, String termVersion)
+		throws NoSuchTermException;
+
 	/**
 	 * Returns a range of all the terms.
 	 *
@@ -440,7 +445,8 @@ public interface TermLocalService
 			long termId, String termName, String termVersion, String termType,
 			Map<Locale, String> displayNameMap,
 			Map<Locale, String> definitionMap, Map<Locale, String> tooltipMap,
-			String synonyms, int status, String attributes, ServiceContext sc)
+			String synonyms, String attributes, String groupTermId, int status,
+			ServiceContext sc)
 		throws PortalException;
 
 	/**

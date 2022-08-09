@@ -8,6 +8,9 @@
 		<!-- PK fields -->
 		<column name="termId" primary="true" type="long"></column>
 
+		<!-- FK fields -->
+		<column name="groupTermId" type="String"></column>
+
 		<!-- Audit fields -->
 		<column name="groupId" type="long"></column>
 		<column name="companyId" type="long"></column>
@@ -70,6 +73,10 @@
 		
 		<finder name="Name" return-type="Collection">
 			<finder-column name="termName" />
+		</finder>
+		<finder name="NameVersion" return-type="Term">
+			<finder-column name="termName" />
+			<finder-column name="termVersion" />
 		</finder>
 		
 		<reference entity="AssetEntry" package-path="com.liferay.portlet.asset" />

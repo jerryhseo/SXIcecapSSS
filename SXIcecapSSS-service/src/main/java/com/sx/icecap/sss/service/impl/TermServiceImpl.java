@@ -69,6 +69,7 @@ public class TermServiceImpl extends TermServiceBaseImpl {
 			String strTooltip,
 			String synonyms,
 			String attributes, // attributes for each type
+			String groupTermId,
 			ServiceContext sc) throws PortalException {
 		
 		_portletResourcePermission.check(
@@ -99,7 +100,7 @@ public class TermServiceImpl extends TermServiceBaseImpl {
 			tooltipMap.put( LanguageUtil.getLocale( key ), jsonTooltip.getString(key) );
 		}
 
-		return TermLocalServiceUtil.addTerm(name, version, type, displayNameMap, definitionMap, tooltipMap, synonyms, attributes, WorkflowConstants.STATUS_DRAFT, sc);
+		return TermLocalServiceUtil.addTerm(name, version, type, displayNameMap, definitionMap, tooltipMap, synonyms, attributes, groupTermId, WorkflowConstants.STATUS_DRAFT, sc);
 	}
 	
 	public Term getTerm( long termId ) throws PortalException {

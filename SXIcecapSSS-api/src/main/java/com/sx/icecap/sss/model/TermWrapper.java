@@ -44,6 +44,7 @@ public class TermWrapper
 
 		attributes.put("uuid", getUuid());
 		attributes.put("termId", getTermId());
+		attributes.put("groupTermId", getGroupTermId());
 		attributes.put("groupId", getGroupId());
 		attributes.put("companyId", getCompanyId());
 		attributes.put("userId", getUserId());
@@ -79,6 +80,12 @@ public class TermWrapper
 
 		if (termId != null) {
 			setTermId(termId);
+		}
+
+		String groupTermId = (String)attributes.get("groupTermId");
+
+		if (groupTermId != null) {
+			setGroupTermId(groupTermId);
 		}
 
 		Long groupId = (Long)attributes.get("groupId");
@@ -408,6 +415,16 @@ public class TermWrapper
 	@Override
 	public long getGroupId() {
 		return model.getGroupId();
+	}
+
+	/**
+	 * Returns the group term ID of this term.
+	 *
+	 * @return the group term ID of this term
+	 */
+	@Override
+	public String getGroupTermId() {
+		return model.getGroupTermId();
 	}
 
 	/**
@@ -926,6 +943,16 @@ public class TermWrapper
 	@Override
 	public void setGroupId(long groupId) {
 		model.setGroupId(groupId);
+	}
+
+	/**
+	 * Sets the group term ID of this term.
+	 *
+	 * @param groupTermId the group term ID of this term
+	 */
+	@Override
+	public void setGroupTermId(String groupTermId) {
+		model.setGroupTermId(groupTermId);
 	}
 
 	/**

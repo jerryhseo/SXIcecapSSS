@@ -86,16 +86,16 @@ public class TermModelImpl extends BaseModelImpl<Term> implements TermModel {
 
 	public static final Object[][] TABLE_COLUMNS = {
 		{"uuid_", Types.VARCHAR}, {"termId", Types.BIGINT},
-		{"groupId", Types.BIGINT}, {"companyId", Types.BIGINT},
-		{"userId", Types.BIGINT}, {"userName", Types.VARCHAR},
-		{"createDate", Types.TIMESTAMP}, {"modifiedDate", Types.TIMESTAMP},
-		{"status", Types.INTEGER}, {"statusByUserId", Types.BIGINT},
-		{"statusByUserName", Types.VARCHAR}, {"statusDate", Types.TIMESTAMP},
-		{"lastPublishDate", Types.TIMESTAMP}, {"termName", Types.VARCHAR},
-		{"termVersion", Types.VARCHAR}, {"termType", Types.VARCHAR},
-		{"displayName", Types.VARCHAR}, {"definition", Types.VARCHAR},
-		{"tooltip", Types.VARCHAR}, {"synonyms", Types.VARCHAR},
-		{"attributesJSON", Types.VARCHAR}
+		{"groupTermId", Types.VARCHAR}, {"groupId", Types.BIGINT},
+		{"companyId", Types.BIGINT}, {"userId", Types.BIGINT},
+		{"userName", Types.VARCHAR}, {"createDate", Types.TIMESTAMP},
+		{"modifiedDate", Types.TIMESTAMP}, {"status", Types.INTEGER},
+		{"statusByUserId", Types.BIGINT}, {"statusByUserName", Types.VARCHAR},
+		{"statusDate", Types.TIMESTAMP}, {"lastPublishDate", Types.TIMESTAMP},
+		{"termName", Types.VARCHAR}, {"termVersion", Types.VARCHAR},
+		{"termType", Types.VARCHAR}, {"displayName", Types.VARCHAR},
+		{"definition", Types.VARCHAR}, {"tooltip", Types.VARCHAR},
+		{"synonyms", Types.VARCHAR}, {"attributesJSON", Types.VARCHAR}
 	};
 
 	public static final Map<String, Integer> TABLE_COLUMNS_MAP =
@@ -104,6 +104,7 @@ public class TermModelImpl extends BaseModelImpl<Term> implements TermModel {
 	static {
 		TABLE_COLUMNS_MAP.put("uuid_", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("termId", Types.BIGINT);
+		TABLE_COLUMNS_MAP.put("groupTermId", Types.VARCHAR);
 		TABLE_COLUMNS_MAP.put("groupId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("companyId", Types.BIGINT);
 		TABLE_COLUMNS_MAP.put("userId", Types.BIGINT);
@@ -126,7 +127,7 @@ public class TermModelImpl extends BaseModelImpl<Term> implements TermModel {
 	}
 
 	public static final String TABLE_SQL_CREATE =
-		"create table sxicecapsss_Term (uuid_ VARCHAR(75) null,termId LONG not null primary key,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,status INTEGER,statusByUserId LONG,statusByUserName VARCHAR(75) null,statusDate DATE null,lastPublishDate DATE null,termName VARCHAR(75) null,termVersion VARCHAR(75) null,termType VARCHAR(75) null,displayName STRING null,definition STRING null,tooltip STRING null,synonyms VARCHAR(512) null,attributesJSON VARCHAR(1024) null)";
+		"create table sxicecapsss_Term (uuid_ VARCHAR(75) null,termId LONG not null primary key,groupTermId VARCHAR(75) null,groupId LONG,companyId LONG,userId LONG,userName VARCHAR(75) null,createDate DATE null,modifiedDate DATE null,status INTEGER,statusByUserId LONG,statusByUserName VARCHAR(75) null,statusDate DATE null,lastPublishDate DATE null,termName VARCHAR(75) null,termVersion VARCHAR(75) null,termType VARCHAR(75) null,displayName STRING null,definition STRING null,tooltip STRING null,synonyms VARCHAR(512) null,attributesJSON VARCHAR(1024) null)";
 
 	public static final String TABLE_SQL_DROP = "drop table sxicecapsss_Term";
 
@@ -149,11 +150,13 @@ public class TermModelImpl extends BaseModelImpl<Term> implements TermModel {
 
 	public static final long TERMNAME_COLUMN_BITMASK = 8L;
 
-	public static final long USERID_COLUMN_BITMASK = 16L;
+	public static final long TERMVERSION_COLUMN_BITMASK = 16L;
 
-	public static final long UUID_COLUMN_BITMASK = 32L;
+	public static final long USERID_COLUMN_BITMASK = 32L;
 
-	public static final long CREATEDATE_COLUMN_BITMASK = 64L;
+	public static final long UUID_COLUMN_BITMASK = 64L;
+
+	public static final long CREATEDATE_COLUMN_BITMASK = 128L;
 
 	public static void setEntityCacheEnabled(boolean entityCacheEnabled) {
 		_entityCacheEnabled = entityCacheEnabled;
@@ -178,6 +181,7 @@ public class TermModelImpl extends BaseModelImpl<Term> implements TermModel {
 
 		model.setUuid(soapModel.getUuid());
 		model.setTermId(soapModel.getTermId());
+		model.setGroupTermId(soapModel.getGroupTermId());
 		model.setGroupId(soapModel.getGroupId());
 		model.setCompanyId(soapModel.getCompanyId());
 		model.setUserId(soapModel.getUserId());
@@ -348,6 +352,9 @@ public class TermModelImpl extends BaseModelImpl<Term> implements TermModel {
 		attributeGetterFunctions.put("termId", Term::getTermId);
 		attributeSetterBiConsumers.put(
 			"termId", (BiConsumer<Term, Long>)Term::setTermId);
+		attributeGetterFunctions.put("groupTermId", Term::getGroupTermId);
+		attributeSetterBiConsumers.put(
+			"groupTermId", (BiConsumer<Term, String>)Term::setGroupTermId);
 		attributeGetterFunctions.put("groupId", Term::getGroupId);
 		attributeSetterBiConsumers.put(
 			"groupId", (BiConsumer<Term, Long>)Term::setGroupId);
@@ -452,6 +459,22 @@ public class TermModelImpl extends BaseModelImpl<Term> implements TermModel {
 	@Override
 	public void setTermId(long termId) {
 		_termId = termId;
+	}
+
+	@JSON
+	@Override
+	public String getGroupTermId() {
+		if (_groupTermId == null) {
+			return "";
+		}
+		else {
+			return _groupTermId;
+		}
+	}
+
+	@Override
+	public void setGroupTermId(String groupTermId) {
+		_groupTermId = groupTermId;
 	}
 
 	@JSON
@@ -712,7 +735,17 @@ public class TermModelImpl extends BaseModelImpl<Term> implements TermModel {
 
 	@Override
 	public void setTermVersion(String termVersion) {
+		_columnBitmask |= TERMVERSION_COLUMN_BITMASK;
+
+		if (_originalTermVersion == null) {
+			_originalTermVersion = _termVersion;
+		}
+
 		_termVersion = termVersion;
+	}
+
+	public String getOriginalTermVersion() {
+		return GetterUtil.getString(_originalTermVersion);
 	}
 
 	@JSON
@@ -1320,6 +1353,7 @@ public class TermModelImpl extends BaseModelImpl<Term> implements TermModel {
 
 		termImpl.setUuid(getUuid());
 		termImpl.setTermId(getTermId());
+		termImpl.setGroupTermId(getGroupTermId());
 		termImpl.setGroupId(getGroupId());
 		termImpl.setCompanyId(getCompanyId());
 		termImpl.setUserId(getUserId());
@@ -1420,6 +1454,8 @@ public class TermModelImpl extends BaseModelImpl<Term> implements TermModel {
 
 		_originalTermName = _termName;
 
+		_originalTermVersion = _termVersion;
+
 		_columnBitmask = 0;
 	}
 
@@ -1436,6 +1472,14 @@ public class TermModelImpl extends BaseModelImpl<Term> implements TermModel {
 		}
 
 		termCacheModel.termId = getTermId();
+
+		termCacheModel.groupTermId = getGroupTermId();
+
+		String groupTermId = termCacheModel.groupTermId;
+
+		if ((groupTermId != null) && (groupTermId.length() == 0)) {
+			termCacheModel.groupTermId = null;
+		}
 
 		termCacheModel.groupId = getGroupId();
 
@@ -1657,6 +1701,7 @@ public class TermModelImpl extends BaseModelImpl<Term> implements TermModel {
 	private String _uuid;
 	private String _originalUuid;
 	private long _termId;
+	private String _groupTermId;
 	private long _groupId;
 	private long _originalGroupId;
 	private boolean _setOriginalGroupId;
@@ -1680,6 +1725,7 @@ public class TermModelImpl extends BaseModelImpl<Term> implements TermModel {
 	private String _termName;
 	private String _originalTermName;
 	private String _termVersion;
+	private String _originalTermVersion;
 	private String _termType;
 	private String _displayName;
 	private String _displayNameCurrentLanguageId;

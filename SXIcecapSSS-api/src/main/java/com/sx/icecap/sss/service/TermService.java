@@ -54,7 +54,7 @@ public interface TermService extends BaseService {
 	public Term addTerm(
 			String name, String version, String type, String strDisplayName,
 			String strDefinition, String strTooltip, String synonyms,
-			String attributes, ServiceContext sc)
+			String attributes, String groupTermId, ServiceContext sc)
 		throws PortalException;
 
 	/**

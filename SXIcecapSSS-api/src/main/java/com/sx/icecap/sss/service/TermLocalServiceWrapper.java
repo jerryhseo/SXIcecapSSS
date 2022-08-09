@@ -36,13 +36,13 @@ public class TermLocalServiceWrapper
 			java.util.Map<java.util.Locale, String> displayNameMap,
 			java.util.Map<java.util.Locale, String> definitionMap,
 			java.util.Map<java.util.Locale, String> tooltipMap, String synonyms,
-			String attributes, int status,
+			String attributes, String groupTermId, int status,
 			com.liferay.portal.kernel.service.ServiceContext sc)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _termLocalService.addTerm(
 			termName, termVersion, termType, displayNameMap, definitionMap,
-			tooltipMap, synonyms, attributes, status, sc);
+			tooltipMap, synonyms, attributes, groupTermId, status, sc);
 	}
 
 	/**
@@ -413,6 +413,13 @@ public class TermLocalServiceWrapper
 		return _termLocalService.getTermByUuidAndGroupId(uuid, groupId);
 	}
 
+	@Override
+	public long getTermIdByNameVersion(String termName, String termVersion)
+		throws com.sx.icecap.sss.exception.NoSuchTermException {
+
+		return _termLocalService.getTermIdByNameVersion(termName, termVersion);
+	}
+
 	/**
 	 * Returns a range of all the terms.
 	 *
@@ -658,13 +665,14 @@ public class TermLocalServiceWrapper
 			java.util.Map<java.util.Locale, String> displayNameMap,
 			java.util.Map<java.util.Locale, String> definitionMap,
 			java.util.Map<java.util.Locale, String> tooltipMap, String synonyms,
-			int status, String attributes,
+			String attributes, String groupTermId, int status,
 			com.liferay.portal.kernel.service.ServiceContext sc)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _termLocalService.updateTerm(
 			termId, termName, termVersion, termType, displayNameMap,
-			definitionMap, tooltipMap, synonyms, status, attributes, sc);
+			definitionMap, tooltipMap, synonyms, attributes, groupTermId,
+			status, sc);
 	}
 
 	/**

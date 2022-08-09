@@ -33,6 +33,7 @@ public class TermSoap implements Serializable {
 
 		soapModel.setUuid(model.getUuid());
 		soapModel.setTermId(model.getTermId());
+		soapModel.setGroupTermId(model.getGroupTermId());
 		soapModel.setGroupId(model.getGroupId());
 		soapModel.setCompanyId(model.getCompanyId());
 		soapModel.setUserId(model.getUserId());
@@ -118,6 +119,14 @@ public class TermSoap implements Serializable {
 
 	public void setTermId(long termId) {
 		_termId = termId;
+	}
+
+	public String getGroupTermId() {
+		return _groupTermId;
+	}
+
+	public void setGroupTermId(String groupTermId) {
+		_groupTermId = groupTermId;
 	}
 
 	public long getGroupId() {
@@ -274,6 +283,7 @@ public class TermSoap implements Serializable {
 
 	private String _uuid;
 	private long _termId;
+	private String _groupTermId;
 	private long _groupId;
 	private long _companyId;
 	private long _userId;

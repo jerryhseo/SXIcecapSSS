@@ -34,13 +34,13 @@ public class TermServiceWrapper
 	public com.sx.icecap.sss.model.Term addTerm(
 			String name, String version, String type, String strDisplayName,
 			String strDefinition, String strTooltip, String synonyms,
-			String attributes,
+			String attributes, String groupTermId,
 			com.liferay.portal.kernel.service.ServiceContext sc)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
 		return _termService.addTerm(
 			name, version, type, strDisplayName, strDefinition, strTooltip,
-			synonyms, attributes, sc);
+			synonyms, attributes, groupTermId, sc);
 	}
 
 	/**

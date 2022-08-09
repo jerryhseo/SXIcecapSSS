@@ -56,6 +56,7 @@ public class TermServiceHttp {
 			HttpPrincipal httpPrincipal, String name, String version,
 			String type, String strDisplayName, String strDefinition,
 			String strTooltip, String synonyms, String attributes,
+			String groupTermId,
 			com.liferay.portal.kernel.service.ServiceContext sc)
 		throws com.liferay.portal.kernel.exception.PortalException {
 
@@ -65,7 +66,7 @@ public class TermServiceHttp {
 
 			MethodHandler methodHandler = new MethodHandler(
 				methodKey, name, version, type, strDisplayName, strDefinition,
-				strTooltip, synonyms, attributes, sc);
+				strTooltip, synonyms, attributes, groupTermId, sc);
 
 			Object returnObj = null;
 
@@ -137,7 +138,7 @@ public class TermServiceHttp {
 
 	private static final Class<?>[] _addTermParameterTypes0 = new Class[] {
 		String.class, String.class, String.class, String.class, String.class,
-		String.class, String.class, String.class,
+		String.class, String.class, String.class, String.class,
 		com.liferay.portal.kernel.service.ServiceContext.class
 	};
 	private static final Class<?>[] _getTermParameterTypes1 = new Class[] {

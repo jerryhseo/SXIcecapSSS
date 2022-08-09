@@ -51,13 +51,13 @@ public class TermLocalServiceUtil {
 			Map<java.util.Locale, String> displayNameMap,
 			Map<java.util.Locale, String> definitionMap,
 			Map<java.util.Locale, String> tooltipMap, String synonyms,
-			String attributes, int status,
+			String attributes, String groupTermId, int status,
 			com.liferay.portal.kernel.service.ServiceContext sc)
 		throws PortalException {
 
 		return getService().addTerm(
 			termName, termVersion, termType, displayNameMap, definitionMap,
-			tooltipMap, synonyms, attributes, status, sc);
+			tooltipMap, synonyms, attributes, groupTermId, status, sc);
 	}
 
 	/**
@@ -362,6 +362,13 @@ public class TermLocalServiceUtil {
 		return getService().getTermByUuidAndGroupId(uuid, groupId);
 	}
 
+	public static long getTermIdByNameVersion(
+			String termName, String termVersion)
+		throws com.sx.icecap.sss.exception.NoSuchTermException {
+
+		return getService().getTermIdByNameVersion(termName, termVersion);
+	}
+
 	/**
 	 * Returns a range of all the terms.
 	 *
@@ -543,13 +550,14 @@ public class TermLocalServiceUtil {
 			Map<java.util.Locale, String> displayNameMap,
 			Map<java.util.Locale, String> definitionMap,
 			Map<java.util.Locale, String> tooltipMap, String synonyms,
-			int status, String attributes,
+			String attributes, String groupTermId, int status,
 			com.liferay.portal.kernel.service.ServiceContext sc)
 		throws PortalException {
 
 		return getService().updateTerm(
 			termId, termName, termVersion, termType, displayNameMap,
-			definitionMap, tooltipMap, synonyms, status, attributes, sc);
+			definitionMap, tooltipMap, synonyms, attributes, groupTermId,
+			status, sc);
 	}
 
 	/**

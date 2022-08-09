@@ -42,8 +42,6 @@ public class AddTermActionCommand extends BaseMVCActionCommand {
 
 		String termType = ParamUtil.getString(actionRequest, IcecapSSSWebKeys.SELECTED_TERM_TYPE);
 		
-		ServiceContext sc = ServiceContextFactory.getInstance(Term.class.getName(), actionRequest);
-		long[] categoryIds = sc.getAssetCategoryIds();
 		
 		String name = ParamUtil.getString(actionRequest, IcecapSSSTermAttributes.TERM_NAME);
 		String version = ParamUtil.getString(actionRequest, IcecapSSSTermAttributes.TERM_VERSION);
@@ -54,6 +52,13 @@ public class AddTermActionCommand extends BaseMVCActionCommand {
 		int status = ParamUtil.getInteger(actionRequest, IcecapSSSTermAttributes.STATUS, WorkflowConstants.STATUS_ANY);
 		String dedicatedAttributes = IcecapSSSTermAttributeUtil.getTypeDedicatedAttributes(actionRequest, termType);
 		
+		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
+		ServiceContext sc = ServiceContextFactory.getInstance(Term.class.getName(), actionRequest);
+		long[] categoryIds = sc.getAssetCategoryIds();
+		for( long categoryId : categoryIds ) {
+			AssetCategory category = AssetCategoryLocalServiceUtil.getCategory(categoryId);
+			System.out.println("Category["+categoryId+"]: "+category.getTitle(themeDisplay.getLocale()));
+		}
 		System.out.println("=== Term Attributes ===");
 		System.out.println(IcecapSSSTermAttributes.TERM_TYPE+": "+termType);
 		System.out.println(IcecapSSSTermAttributes.TERM_NAME+": "+name);
@@ -65,14 +70,9 @@ public class AddTermActionCommand extends BaseMVCActionCommand {
 		System.out.println("Dedicated Attributes: "+dedicatedAttributes);
 		System.out.println("Category Count: "+categoryIds.length);
 		
-		ThemeDisplay themeDisplay = (ThemeDisplay)actionRequest.getAttribute(WebKeys.THEME_DISPLAY);
-		for( long categoryId : categoryIds ) {
-			AssetCategory category = AssetCategoryLocalServiceUtil.getCategory(categoryId);
-			System.out.println("Category["+categoryId+"]: "+category.getTitle(themeDisplay.getLocale()));
-		}
 		System.out.println("=== END Term Attributes ===");
 		
-		_termLocalService.addTerm(name, version, termType, displayNameMap, definitionMap, tooltipMap, synonyms, dedicatedAttributes, status, sc);
+		_termLocalService.addTerm(name, version, termType, displayNameMap, definitionMap, tooltipMap, synonyms, dedicatedAttributes, "", status, sc);
 	}
 	
 	@Reference

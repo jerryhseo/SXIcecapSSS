@@ -61,12 +61,14 @@ public class TermCacheModel implements CacheModel<Term>, Externalizable {
 
 	@Override
 	public String toString() {
-		StringBundler sb = new StringBundler(43);
+		StringBundler sb = new StringBundler(45);
 
 		sb.append("{uuid=");
 		sb.append(uuid);
 		sb.append(", termId=");
 		sb.append(termId);
+		sb.append(", groupTermId=");
+		sb.append(groupTermId);
 		sb.append(", groupId=");
 		sb.append(groupId);
 		sb.append(", companyId=");
@@ -122,6 +124,14 @@ public class TermCacheModel implements CacheModel<Term>, Externalizable {
 		}
 
 		termImpl.setTermId(termId);
+
+		if (groupTermId == null) {
+			termImpl.setGroupTermId("");
+		}
+		else {
+			termImpl.setGroupTermId(groupTermId);
+		}
+
 		termImpl.setGroupId(groupId);
 		termImpl.setCompanyId(companyId);
 		termImpl.setUserId(userId);
@@ -237,6 +247,7 @@ public class TermCacheModel implements CacheModel<Term>, Externalizable {
 		uuid = objectInput.readUTF();
 
 		termId = objectInput.readLong();
+		groupTermId = objectInput.readUTF();
 
 		groupId = objectInput.readLong();
 
@@ -273,6 +284,13 @@ public class TermCacheModel implements CacheModel<Term>, Externalizable {
 		}
 
 		objectOutput.writeLong(termId);
+
+		if (groupTermId == null) {
+			objectOutput.writeUTF("");
+		}
+		else {
+			objectOutput.writeUTF(groupTermId);
+		}
 
 		objectOutput.writeLong(groupId);
 
@@ -363,6 +381,7 @@ public class TermCacheModel implements CacheModel<Term>, Externalizable {
 
 	public String uuid;
 	public long termId;
+	public String groupTermId;
 	public long groupId;
 	public long companyId;
 	public long userId;

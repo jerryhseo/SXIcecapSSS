@@ -38,6 +38,7 @@ import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.PropsUtil;
 import com.liferay.portal.kernel.util.ProxyUtil;
 import com.liferay.portal.kernel.util.SetUtil;
+import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.uuid.PortalUUIDUtil;
 
@@ -54,6 +55,7 @@ import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -7206,6 +7208,305 @@ public class TermPersistenceImpl
 	private static final String _FINDER_COLUMN_NAME_TERMNAME_3 =
 		"(term.termName IS NULL OR term.termName = '')";
 
+	private FinderPath _finderPathFetchByNameVersion;
+	private FinderPath _finderPathCountByNameVersion;
+
+	/**
+	 * Returns the term where termName = &#63; and termVersion = &#63; or throws a <code>NoSuchTermException</code> if it could not be found.
+	 *
+	 * @param termName the term name
+	 * @param termVersion the term version
+	 * @return the matching term
+	 * @throws NoSuchTermException if a matching term could not be found
+	 */
+	@Override
+	public Term findByNameVersion(String termName, String termVersion)
+		throws NoSuchTermException {
+
+		Term term = fetchByNameVersion(termName, termVersion);
+
+		if (term == null) {
+			StringBundler sb = new StringBundler(6);
+
+			sb.append(_NO_SUCH_ENTITY_WITH_KEY);
+
+			sb.append("termName=");
+			sb.append(termName);
+
+			sb.append(", termVersion=");
+			sb.append(termVersion);
+
+			sb.append("}");
+
+			if (_log.isDebugEnabled()) {
+				_log.debug(sb.toString());
+			}
+
+			throw new NoSuchTermException(sb.toString());
+		}
+
+		return term;
+	}
+
+	/**
+	 * Returns the term where termName = &#63; and termVersion = &#63; or returns <code>null</code> if it could not be found. Uses the finder cache.
+	 *
+	 * @param termName the term name
+	 * @param termVersion the term version
+	 * @return the matching term, or <code>null</code> if a matching term could not be found
+	 */
+	@Override
+	public Term fetchByNameVersion(String termName, String termVersion) {
+		return fetchByNameVersion(termName, termVersion, true);
+	}
+
+	/**
+	 * Returns the term where termName = &#63; and termVersion = &#63; or returns <code>null</code> if it could not be found, optionally using the finder cache.
+	 *
+	 * @param termName the term name
+	 * @param termVersion the term version
+	 * @param useFinderCache whether to use the finder cache
+	 * @return the matching term, or <code>null</code> if a matching term could not be found
+	 */
+	@Override
+	public Term fetchByNameVersion(
+		String termName, String termVersion, boolean useFinderCache) {
+
+		termName = Objects.toString(termName, "");
+		termVersion = Objects.toString(termVersion, "");
+
+		Object[] finderArgs = null;
+
+		if (useFinderCache) {
+			finderArgs = new Object[] {termName, termVersion};
+		}
+
+		Object result = null;
+
+		if (useFinderCache) {
+			result = finderCache.getResult(
+				_finderPathFetchByNameVersion, finderArgs, this);
+		}
+
+		if (result instanceof Term) {
+			Term term = (Term)result;
+
+			if (!Objects.equals(termName, term.getTermName()) ||
+				!Objects.equals(termVersion, term.getTermVersion())) {
+
+				result = null;
+			}
+		}
+
+		if (result == null) {
+			StringBundler sb = new StringBundler(4);
+
+			sb.append(_SQL_SELECT_TERM_WHERE);
+
+			boolean bindTermName = false;
+
+			if (termName.isEmpty()) {
+				sb.append(_FINDER_COLUMN_NAMEVERSION_TERMNAME_3);
+			}
+			else {
+				bindTermName = true;
+
+				sb.append(_FINDER_COLUMN_NAMEVERSION_TERMNAME_2);
+			}
+
+			boolean bindTermVersion = false;
+
+			if (termVersion.isEmpty()) {
+				sb.append(_FINDER_COLUMN_NAMEVERSION_TERMVERSION_3);
+			}
+			else {
+				bindTermVersion = true;
+
+				sb.append(_FINDER_COLUMN_NAMEVERSION_TERMVERSION_2);
+			}
+
+			String sql = sb.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query query = session.createQuery(sql);
+
+				QueryPos queryPos = QueryPos.getInstance(query);
+
+				if (bindTermName) {
+					queryPos.add(termName);
+				}
+
+				if (bindTermVersion) {
+					queryPos.add(termVersion);
+				}
+
+				List<Term> list = query.list();
+
+				if (list.isEmpty()) {
+					if (useFinderCache) {
+						finderCache.putResult(
+							_finderPathFetchByNameVersion, finderArgs, list);
+					}
+				}
+				else {
+					if (list.size() > 1) {
+						Collections.sort(list, Collections.reverseOrder());
+
+						if (_log.isWarnEnabled()) {
+							if (!useFinderCache) {
+								finderArgs = new Object[] {
+									termName, termVersion
+								};
+							}
+
+							_log.warn(
+								"TermPersistenceImpl.fetchByNameVersion(String, String, boolean) with parameters (" +
+									StringUtil.merge(finderArgs) +
+										") yields a result set with more than 1 result. This violates the logical unique restriction. There is no order guarantee on which result is returned by this finder.");
+						}
+					}
+
+					Term term = list.get(0);
+
+					result = term;
+
+					cacheResult(term);
+				}
+			}
+			catch (Exception exception) {
+				if (useFinderCache) {
+					finderCache.removeResult(
+						_finderPathFetchByNameVersion, finderArgs);
+				}
+
+				throw processException(exception);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		if (result instanceof List<?>) {
+			return null;
+		}
+		else {
+			return (Term)result;
+		}
+	}
+
+	/**
+	 * Removes the term where termName = &#63; and termVersion = &#63; from the database.
+	 *
+	 * @param termName the term name
+	 * @param termVersion the term version
+	 * @return the term that was removed
+	 */
+	@Override
+	public Term removeByNameVersion(String termName, String termVersion)
+		throws NoSuchTermException {
+
+		Term term = findByNameVersion(termName, termVersion);
+
+		return remove(term);
+	}
+
+	/**
+	 * Returns the number of terms where termName = &#63; and termVersion = &#63;.
+	 *
+	 * @param termName the term name
+	 * @param termVersion the term version
+	 * @return the number of matching terms
+	 */
+	@Override
+	public int countByNameVersion(String termName, String termVersion) {
+		termName = Objects.toString(termName, "");
+		termVersion = Objects.toString(termVersion, "");
+
+		FinderPath finderPath = _finderPathCountByNameVersion;
+
+		Object[] finderArgs = new Object[] {termName, termVersion};
+
+		Long count = (Long)finderCache.getResult(finderPath, finderArgs, this);
+
+		if (count == null) {
+			StringBundler sb = new StringBundler(3);
+
+			sb.append(_SQL_COUNT_TERM_WHERE);
+
+			boolean bindTermName = false;
+
+			if (termName.isEmpty()) {
+				sb.append(_FINDER_COLUMN_NAMEVERSION_TERMNAME_3);
+			}
+			else {
+				bindTermName = true;
+
+				sb.append(_FINDER_COLUMN_NAMEVERSION_TERMNAME_2);
+			}
+
+			boolean bindTermVersion = false;
+
+			if (termVersion.isEmpty()) {
+				sb.append(_FINDER_COLUMN_NAMEVERSION_TERMVERSION_3);
+			}
+			else {
+				bindTermVersion = true;
+
+				sb.append(_FINDER_COLUMN_NAMEVERSION_TERMVERSION_2);
+			}
+
+			String sql = sb.toString();
+
+			Session session = null;
+
+			try {
+				session = openSession();
+
+				Query query = session.createQuery(sql);
+
+				QueryPos queryPos = QueryPos.getInstance(query);
+
+				if (bindTermName) {
+					queryPos.add(termName);
+				}
+
+				if (bindTermVersion) {
+					queryPos.add(termVersion);
+				}
+
+				count = (Long)query.uniqueResult();
+
+				finderCache.putResult(finderPath, finderArgs, count);
+			}
+			catch (Exception exception) {
+				finderCache.removeResult(finderPath, finderArgs);
+
+				throw processException(exception);
+			}
+			finally {
+				closeSession(session);
+			}
+		}
+
+		return count.intValue();
+	}
+
+	private static final String _FINDER_COLUMN_NAMEVERSION_TERMNAME_2 =
+		"term.termName = ? AND ";
+
+	private static final String _FINDER_COLUMN_NAMEVERSION_TERMNAME_3 =
+		"(term.termName IS NULL OR term.termName = '') AND ";
+
+	private static final String _FINDER_COLUMN_NAMEVERSION_TERMVERSION_2 =
+		"term.termVersion = ?";
+
+	private static final String _FINDER_COLUMN_NAMEVERSION_TERMVERSION_3 =
+		"(term.termVersion IS NULL OR term.termVersion = '')";
+
 	public TermPersistenceImpl() {
 		Map<String, String> dbColumnNames = new HashMap<String, String>();
 
@@ -7232,6 +7533,10 @@ public class TermPersistenceImpl
 		finderCache.putResult(
 			_finderPathFetchByUUID_G,
 			new Object[] {term.getUuid(), term.getGroupId()}, term);
+
+		finderCache.putResult(
+			_finderPathFetchByNameVersion,
+			new Object[] {term.getTermName(), term.getTermVersion()}, term);
 
 		term.resetOriginalValues();
 	}
@@ -7332,6 +7637,15 @@ public class TermPersistenceImpl
 			_finderPathCountByUUID_G, args, Long.valueOf(1), false);
 		finderCache.putResult(
 			_finderPathFetchByUUID_G, args, termModelImpl, false);
+
+		args = new Object[] {
+			termModelImpl.getTermName(), termModelImpl.getTermVersion()
+		};
+
+		finderCache.putResult(
+			_finderPathCountByNameVersion, args, Long.valueOf(1), false);
+		finderCache.putResult(
+			_finderPathFetchByNameVersion, args, termModelImpl, false);
 	}
 
 	protected void clearUniqueFindersCache(
@@ -7356,6 +7670,27 @@ public class TermPersistenceImpl
 
 			finderCache.removeResult(_finderPathCountByUUID_G, args);
 			finderCache.removeResult(_finderPathFetchByUUID_G, args);
+		}
+
+		if (clearCurrent) {
+			Object[] args = new Object[] {
+				termModelImpl.getTermName(), termModelImpl.getTermVersion()
+			};
+
+			finderCache.removeResult(_finderPathCountByNameVersion, args);
+			finderCache.removeResult(_finderPathFetchByNameVersion, args);
+		}
+
+		if ((termModelImpl.getColumnBitmask() &
+			 _finderPathFetchByNameVersion.getColumnBitmask()) != 0) {
+
+			Object[] args = new Object[] {
+				termModelImpl.getOriginalTermName(),
+				termModelImpl.getOriginalTermVersion()
+			};
+
+			finderCache.removeResult(_finderPathCountByNameVersion, args);
+			finderCache.removeResult(_finderPathFetchByNameVersion, args);
 		}
 	}
 
@@ -8345,6 +8680,18 @@ public class TermPersistenceImpl
 			entityCacheEnabled, finderCacheEnabled, Long.class,
 			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByName",
 			new String[] {String.class.getName()});
+
+		_finderPathFetchByNameVersion = new FinderPath(
+			entityCacheEnabled, finderCacheEnabled, TermImpl.class,
+			FINDER_CLASS_NAME_ENTITY, "fetchByNameVersion",
+			new String[] {String.class.getName(), String.class.getName()},
+			TermModelImpl.TERMNAME_COLUMN_BITMASK |
+			TermModelImpl.TERMVERSION_COLUMN_BITMASK);
+
+		_finderPathCountByNameVersion = new FinderPath(
+			entityCacheEnabled, finderCacheEnabled, Long.class,
+			FINDER_CLASS_NAME_LIST_WITHOUT_PAGINATION, "countByNameVersion",
+			new String[] {String.class.getName(), String.class.getName()});
 
 		_setTermUtilPersistence(this);
 	}

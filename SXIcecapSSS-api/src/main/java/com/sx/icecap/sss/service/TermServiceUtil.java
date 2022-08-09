@@ -40,13 +40,13 @@ public class TermServiceUtil {
 	public static Term addTerm(
 			String name, String version, String type, String strDisplayName,
 			String strDefinition, String strTooltip, String synonyms,
-			String attributes,
+			String attributes, String groupTermId,
 			com.liferay.portal.kernel.service.ServiceContext sc)
 		throws PortalException {
 
 		return getService().addTerm(
 			name, version, type, strDisplayName, strDefinition, strTooltip,
-			synonyms, attributes, sc);
+			synonyms, attributes, groupTermId, sc);
 	}
 
 	/**

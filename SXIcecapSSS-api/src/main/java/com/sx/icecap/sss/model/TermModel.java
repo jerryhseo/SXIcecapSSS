@@ -96,6 +96,21 @@ public interface TermModel
 	public void setTermId(long termId);
 
 	/**
+	 * Returns the group term ID of this term.
+	 *
+	 * @return the group term ID of this term
+	 */
+	@AutoEscape
+	public String getGroupTermId();
+
+	/**
+	 * Sets the group term ID of this term.
+	 *
+	 * @param groupTermId the group term ID of this term
+	 */
+	public void setGroupTermId(String groupTermId);
+
+	/**
 	 * Returns the group ID of this term.
 	 *
 	 * @return the group ID of this term

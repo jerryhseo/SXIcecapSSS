@@ -156,58 +156,12 @@
 	<aui:row>
 		<aui:col>
 			<aui:input type="hidden" name="termId" value="<%= Validator.isNotNull(term)?term.getTermId():StringPool.BLANK %>"></aui:input>
-			<aui:input type="hidden" name="selectedTermType" value="<%= defaultTermType %>"></aui:input>
+			
 			<%@include file="jspf/term-definition.jspf" %>
-		</aui:col>
-	</aui:row>
-	<aui:row>
-		<aui:col id="dedicatedAttributes">
-			<c:choose>
-				<c:when test="<%= defaultTermType.equals(IcecapSSSTermTypes.STRING) %>">
-					<%@include file="jspf/string-attributes.jspf" %>
-				</c:when> 
-				<c:when test="<%= defaultTermType.equals(IcecapSSSTermTypes.NUMERIC) %>">
-					<%@include file="jspf/numeric-attributes.jspf" %>
-				</c:when> 
-				<c:when test="<%= defaultTermType.equals(IcecapSSSTermTypes.LIST) %>">
-					<%@include file="jspf/list-attributes.jspf" %>
-				</c:when> 
-				<c:when test="<%= defaultTermType.equals(IcecapSSSTermTypes.LIST_ARRAY) %>">
-					<%@include file="jspf/list-array-attributes.jspf" %>
-				</c:when> 
-				<c:when test="<%= defaultTermType.equals(IcecapSSSTermTypes.BOOLEAN) %>">
-					<%@include file="jspf/boolean-attributes.jspf" %>
-				</c:when> 
-				<c:when test="<%= defaultTermType.equals(IcecapSSSTermTypes.ARRAY) %>">
-					<%@include file="jspf/array-attributes.jspf" %>
-				</c:when> 
-				<c:when test="<%= defaultTermType.equals(IcecapSSSTermTypes.MATRIX) %>">
-					<%@include file="jspf/matrix-attributes.jspf" %>
-				</c:when> 
-				<c:when test="<%= defaultTermType.equals(IcecapSSSTermTypes.OBJECT) %>">
-					<%@include file="jspf/object-attributes.jspf" %>
-				</c:when> 
-				<c:when test="<%= defaultTermType.equals(IcecapSSSTermTypes.OBJECT_ARRAY) %>">
-					<%@include file="jspf/object-array-attributes.jspf" %>
-				</c:when> 
-				<c:when test="<%= defaultTermType.equals(IcecapSSSTermTypes.DATA_LINK) %>">
-					<%@include file="jspf/data-link-attributes.jspf" %>
-				</c:when> 
-				<c:when test="<%= defaultTermType.equals(IcecapSSSTermTypes.DATA_LINK_ARRAY) %>">
-					<%@include file="jspf/data-link-array-attributes.jspf" %>
-				</c:when> 
-				<c:when test="<%= defaultTermType.equals(IcecapSSSTermTypes.FILE) %>">
-					<%@include file="jspf/file-attributes.jspf" %>
-				</c:when> 
-				<c:when test="<%= defaultTermType.equals(IcecapSSSTermTypes.FILE_ARRAY) %>">
-					<%@include file="jspf/file-array-attributes.jspf" %>
-				</c:when> 
-				<c:when test="<%= defaultTermType.equals(IcecapSSSTermTypes.PHONE) %>">
-					<%@include file="jspf/phone-attributes.jspf" %>
-				</c:when>
-				<c:otherwise>
-				</c:otherwise>
-			</c:choose>
+			
+			<hr class="content-horizontal-line">
+		
+			<%@include file="../templates/type-specific-attributes.jspf" %>
 		</aui:col>
 	</aui:row>
 	<aui:row>
@@ -238,9 +192,9 @@
 <script>
 $(document).ready(function(){
 	let SX = StationX(  '<portlet:namespace/>', 
-			'<%= defaultLocale.toString() %>',
-			'<%= locale.toString() %>',
-			<%= jsonLocales.toJSONString() %> );
+								'<%= defaultLocale.toString() %>',
+								'<%= locale.toString() %>',
+								<%= jsonLocales.toJSONString() %> );
 
 	
 	var hasDedicatedAttributes = function( termType ){
@@ -251,17 +205,279 @@ $(document).ready(function(){
 		return true;
 	};
 	
-	$('#<portlet:namespace/>termType').change(function(){
-		var termType = $('#<portlet:namespace/>termType').val();
-		console.log('termType: '+termType);
-		$('#<portlet:namespace/>selectedTermType').val(termType);
+	SX.Term.$TERM_TYPE_FORM_CTRL.change(function(eventObj){
+		let selectedTermType = currentTerm.getTermTypeFormValue();
 		
-		if( hasDedicatedAttributes( termType ) ){
-			$('#<portlet:namespace/>termTypeForm').submit();
+		if( selectedTermType === currentTerm.termType ){
+			// Do nothing
+			return;
+		}
+		
+		if( currentTerm.isRendered() ){
+			$.alert({
+				title: '<liferay-ui:message key="term-type-change-alert"/>',
+				content: 'how-to-term-type-change'
+			});
+			
+			setCurrentTerm( currentTerm );
 		}
 		else{
-			$('#<portlet:namespace/>dedicatedAttributes').empty();
+			setCurrentTerm( dataStructure.createTerm( selectedTermType ) );
 		}
+	});
+	
+	SX.Term.$TERM_NAME_FORM_CTRL.change(function(eventObj){
+		if( currentTerm.$rendered ){
+			// It means the current term is one of the data structure and previewed on the preview panel.
+			// Therefore, we must confirm that the term's name be changed before the preview changed.
+			$.confirm({
+				title: '<liferay-ui:message key="select-term-type" />',
+				content: '<liferay-ui:message key="this-term-is-previewed-are-you-sure-to-change-the-name-of-the-term" />',
+				type: 'orange',
+				typeAnimated: true,
+				buttons:{
+					ok: {
+						text: 'OK',
+						btnClass: 'btn-blue',
+						action: function(){
+							let changedName = currentTerm.getTermNameFormValue();
+							if( dataStructure.exist( changedName ) ){
+								$.alert( changedName + 'already exist. Should be changed another name.' );
+								currentTerm.setTermNameFormValue();
+							}
+							else{
+								if( currentTerm.validateNameExpression( changedName ) === true ){
+									currentTerm.termName = changedName;
+									
+									dataStructure.refreshTerm( currentTerm );
+								}
+								else{
+									$.alert( 'Term Name[' + changedName +'] is unvalid. Try another one.');
+									currentTerm.setTermNameFormValue();
+								}
+							} 
+						}
+					},
+					cancel: function(){
+						currentTerm.setTermNameFormValue();
+					}
+				},
+				draggable: true
+			}); 
+		}
+		else{
+			currentTerm.getTermNameFormValue( true );
+		}
+	});
+
+	SX.Term.$TERM_VERSION_FORM_CTRL.change(function(eventObj){
+		const changedVersion = currentTerm.getTermVersionFormValue();
+		
+		let validated;
+		if( currentTerm.$rendered ){
+			validated = SX.Term.validateTermVersion( changedVersion, currentTerm.termVersion );
+		}
+		else{
+			validated = SX.Term.validateTermVersion( changedVersion );
+		}
+		
+		if( validated === true ){
+			currentTerm.termVersion = changedVersion;
+		}
+		else{
+			$.alert( changedVersion + ' ' + validated );
+			currentTerm.setTermVersionFormValue();
+		} 
+	});
+
+	SX.Term.$TERM_DISPLAY_NAME_FORM_CTRL.change(function(eventObj){
+		currentTerm.getDisplayNameFormValue(true);
+	
+		dataStructure.refreshTerm( currentTerm );
+	});
+	
+	$('#<portlet:namespace/>termDefinition').change(function(eventObj){
+		currentTerm.getDefinitionFormValue(true);
+	});
+
+	$('#<portlet:namespace/>termTooltip').change(function(eventObj){
+		currentTerm.getTooltipFormValue(true);
+		dataStructure.refreshTerm( currentTerm );
+	});
+	
+	$('#<portlet:namespace/>placeHolder').change(function(eventObj){
+		currentTerm.getPlaceHolderFormValue(true);
+		dataStructure.refreshTerm( currentTerm );
+	});
+	
+	$('#<portlet:namespace/>synonyms').change(function(eventObj){
+		currentTerm.getSynonymsFormValue(true);
+	});
+	
+	$('#<portlet:namespace/>mandatory').change(function(eventObj){
+		currentTerm.getMandatoryFormValue(true);
+		dataStructure.refreshTerm( currentTerm );
+	});
+	
+	$('#<portlet:namespace/>value').change(function(eventObj){
+		currentTerm.getValueFormValue(true);
+		dataStructure.refreshTerm( currentTerm );
+	});
+
+	$('#<portlet:namespace/>minLength').change(function(eventObj){
+		const changedValue = Number( currentTerm.getMinLengthFormValue() );
+		console.log( 'Changed number: '+changedValue );
+		if( isNaN( changedValue ) || changedValue <= 0){
+			$.alert('Minimum length should be an interger larger than 0.');
+			currentTerm.setMinLengthFormValue()
+		}
+		else{
+			currentTerm.minLength = changedValue;
+			dataStructure.refreshTerm( currentTerm );
+		}
+	});
+	
+	$('#<portlet:namespace/>maxLength').change(function(eventObj){
+		const minLength = currentTerm.getMinLengthFormValue();
+		const maxLength = currentTerm.getMaxLengthFormValue();
+		if( maxLength < minLength ){
+			$.alert('Maximum length should be larger than minimum length.');
+			currentTerm.setMaxLengthFormValue();
+		}
+		else{
+			currentTerm.getMaxLengthFormValue(true);
+			dataStructure.refreshTerm( currentTerm );
+		}
+	});
+
+	$('#<portlet:namespace/>multipleLine').change(function(eventObj){
+		currentTerm.getMultipleLineFormValue(true);
+		dataStructure.refreshTerm( currentTerm );
+	});
+
+	$('#<portlet:namespace/>validationRule').change(function(eventObj){
+		currentTerm.getValidationRuleFormValue(true);
+	});
+	
+	$('#<portlet:namespace/>minValue').change(function(eventObj){
+		const preValue = currentTerm.minValue;
+	
+		currentTerm.getMinValueFormValue(true);
+		
+		if( !currentTerm.minValue ){
+			currentTerm.setMinBoundaryFormValue();
+			dataStructure.disable(['minBoundary'], true);
+			//$('#<portlet:namespace/>minBoundary').prop('disabled', true);
+		}
+		else{
+			dataStructure.disable(['minBoundary'], false);
+			//$('#<portlet:namespace/>minBoundary').prop('disabled', false);
+		}
+		
+		if( preValue !== currentTerm.minValue ){
+			dataStructure.refreshTerm( currentTerm );
+		}
+	});
+
+	$('#<portlet:namespace/>minBoundary').change(function(eventObj){
+		currentTerm.getMinBoundaryFormValue(true);
+		dataStructure.refreshTerm( currentTerm );
+	});
+	
+	$('#<portlet:namespace/>maxValue').change(function(eventObj){
+		const preValue = currentTerm.maxValue;
+		
+		currentTerm.getMaxValueFormValue(true);
+		
+		if( !currentTerm.maxValue ){
+			currentTerm.setMaxBoundaryFormValue();
+			dataStructure.disable(['maxBoundary'], true);
+//			$('#<portlet:namespace/>maxBoundary').prop('disabled', true);
+		}
+		else{
+			dataStructure.disable(['maxBoundary'], false);
+//			$('#<portlet:namespace/>maxBoundary').prop('disabled', false);
+		}
+		
+		if( preValue !== currentTerm.maxValue ){
+			dataStructure.refreshTerm( currentTerm );
+		}
+	});
+
+	$('#<portlet:namespace/>maxBoundary').change(function(eventObj){
+		currentTerm.getMaxBoundaryFormValue(true);
+		dataStructure.refreshTerm( currentTerm );
+	});
+
+	$('#<portlet:namespace/>unit').change(function(eventObj){
+		currentTerm.getUnitFormValue(true);
+		dataStructure.refreshTerm( currentTerm );
+	});
+	
+	$('#<portlet:namespace/>uncertainty').change(function(eventObj){
+		currentTerm.getUncertaintyFormValue(true);
+		dataStructure.refreshTerm( currentTerm );
+	});
+
+	$('#<portlet:namespace/>sweepable').change(function(eventObj){
+		currentTerm.getSweepableFormValue(true);
+	});
+	
+	$('input[name="<portlet:namespace/>listDisplayStyle"]').change(function(eventObj){
+		currentTerm.getDisplayStyleFormValue(true);
+		dataStructure.refreshTerm( currentTerm );
+	});
+	
+	SX.ListTerm.$OPTION_LABEL.change(function(event){
+		let labelMap = currentTerm.getOptionLabelFormValue();
+		if( Object.keys(labelMap).length === 0 ){
+			$.alert('<liferay-ui:message key="option-label-required"/>');
+			currentTerm.setOptionLabelFormValue();
+			SX.ListTerm.$OPTION_LABEL.focus();
+			
+			return;
+		}
+		
+		currentTerm.setOptionLabelMap( labelMap );
+		
+		dataStructure.refreshTerm( currentTerm );
+	});
+	
+	SX.ListTerm.$OPTION_VALUE.change(function(event){
+		let value = currentTerm.getOptionValueFormValue();
+		if( !value ){
+			$.alert('<liferay-ui:message key="option-label-required"/>');
+			currentTerm.setOptionValueFormValue();
+			SX.ListTerm.$OPTION_VALUE.focus();
+			
+			return;
+		}
+		
+		currentTerm.setOptionValue( value );
+		
+		dataStructure.refreshTerm( currentTerm );
+	});
+	
+	SX.ListTerm.$OPTION_SELECTED.change(function(event){
+		let value = currentTerm.getOptionSelectedFormValue();
+		
+		currentTerm.setOptionSelected( value );
+		
+		dataStructure.refreshTerm( currentTerm );
+	});
+	
+	SX.ListTerm.$OPTION_ACTIVE_TERMS.change(function(event){
+		let activeTermNames = currentTerm.getActiveTermsFormValue();
+		
+		currentTerm.setActiveTerms( activeTermNames );
+		
+		console.log('active terms: ', activeTermNames);
+	});
+	
+	$('input[name="<portlet:namespace/>booleanDisplayStyle"]').change(function(event){
+		console.log( 'Boolean display style changed: ', currentTerm.getDisplayStyleFormValue( true ) );
+		
+		dataStructure.refreshTerm( currentTerm );
 	});
 	
 });

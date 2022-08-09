@@ -65,14 +65,14 @@ public class TermServiceSoap {
 	public static com.sx.icecap.sss.model.TermSoap addTerm(
 			String name, String version, String type, String strDisplayName,
 			String strDefinition, String strTooltip, String synonyms,
-			String attributes,
+			String attributes, String groupTermId,
 			com.liferay.portal.kernel.service.ServiceContext sc)
 		throws RemoteException {
 
 		try {
 			com.sx.icecap.sss.model.Term returnValue = TermServiceUtil.addTerm(
 				name, version, type, strDisplayName, strDefinition, strTooltip,
-				synonyms, attributes, sc);
+				synonyms, attributes, groupTermId, sc);
 
 			return com.sx.icecap.sss.model.TermSoap.toSoapModel(returnValue);
 		}

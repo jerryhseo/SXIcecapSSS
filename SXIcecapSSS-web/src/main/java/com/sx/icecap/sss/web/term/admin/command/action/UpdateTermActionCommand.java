@@ -79,7 +79,7 @@ public class UpdateTermActionCommand extends BaseMVCActionCommand {
 		}
 		System.out.println("=== END Term Attributes ===");
 		
-		_termLocalService.updateTerm(termId, name, version, termType, displayNameMap, definitionMap, tooltipMap, synonyms, status, dedicatedAttributes, sc);
+		_termLocalService.updateTerm(termId, name, version, termType, displayNameMap, definitionMap, tooltipMap, synonyms, dedicatedAttributes, "", status, sc);
 	}
 	
 	@Reference

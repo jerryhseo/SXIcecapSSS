@@ -78,6 +78,7 @@ public class TermLocalServiceImpl extends TermLocalServiceBaseImpl {
 			Map<Locale, String> tooltipMap,
 			String synonyms,
 			String attributes, // attributes for each type
+			String groupTermId,
 			int status,
 			ServiceContext sc) throws PortalException {
 		
@@ -98,6 +99,8 @@ public class TermLocalServiceImpl extends TermLocalServiceBaseImpl {
 		if( attributes != null ) {
 			term.setAttributesJSON(attributes);
 		}
+		
+		term.setGroupTermId(groupTermId);
 		
 		Date now = new Date();
 		User user = super.userLocalService.getUser(sc.getUserId());
@@ -181,8 +184,9 @@ public class TermLocalServiceImpl extends TermLocalServiceBaseImpl {
 			Map<Locale, String> definitionMap,
 			Map<Locale, String> tooltipMap,
 			String synonyms,
-			int status,
 			String attributes, // attributes for each type
+			String groupTermId,
+			int status,
 			ServiceContext sc) throws PortalException {
 		Term term = super.termPersistence.findByPrimaryKey(termId);
 		
@@ -196,6 +200,7 @@ public class TermLocalServiceImpl extends TermLocalServiceBaseImpl {
 		if( attributes != null ) {
 			term.setAttributesJSON(attributes);
 		}
+		term.setGroupTermId(groupTermId);
 		
 		term.setUserId(sc.getUserId());
 		term.setGroupId(sc.getScopeGroupId());
@@ -376,6 +381,12 @@ public class TermLocalServiceImpl extends TermLocalServiceBaseImpl {
 
 	public List<Term> getTermsByName( String termName ){
 		return super.termPersistence.findByName(termName);
+	}
+	
+	public long getTermIdByNameVersion( String termName, String termVersion ) throws NoSuchTermException{
+		Term term = super.termPersistence.findByNameVersion(termName, termVersion);
+		
+		return term.getPrimaryKey();
 	}
 	
 	public List<Term> getTermsByG_S( long groupId, int status ){

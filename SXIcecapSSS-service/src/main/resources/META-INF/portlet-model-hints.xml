@@ -4,6 +4,7 @@
 	<model name="com.sx.icecap.sss.model.Term">
 		<field name="uuid" type="String" />
 		<field name="termId" type="long" />
+		<field name="groupTermId" type="String" />
 		<field name="groupId" type="long" />
 		<field name="companyId" type="long" />
 		<field name="userId" type="long" />

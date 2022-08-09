@@ -1,6 +1,7 @@
 create table sxicecapsss_Term (
 	uuid_ VARCHAR(75) null,
 	termId LONG not null primary key,
+	groupTermId VARCHAR(75) null,
 	groupId LONG,
 	companyId LONG,
 	userId LONG,
